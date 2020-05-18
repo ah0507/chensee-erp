@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.product.mapper.ProductOutputDao">
+    <insert id="addProductOutput" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_product_output
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId!=null"> `product_id`,</if>
+            <if test="unit!=null"> `unit`,</if>
+            <if test="price!=null"> `price`,</if>
+            <if test="amount!=null"> `amount`,</if>
+            <if test="total!=null"> `total`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="outputBillId!=null"> `output_bill_id`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="strategy!=null"> `strategy`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId!=null"> #{productId,jdbcType=INTEGER},</if>
+            <if test="unit!=null"> #{unit,jdbcType=VARCHAR},</if>
+            <if test="price!=null"> #{price,jdbcType=INTEGER},</if>
+            <if test="amount!=null"> #{amount,jdbcType=INTEGER},</if>
+            <if test="total!=null"> #{total,jdbcType=INTEGER},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="outputBillId!=null"> #{outputBillId,jdbcType=INTEGER},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="strategy!=null"> #{strategy,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteProductOutputByBillId">
+        UPDATE t_product_output set status = 1 WHERE output_bill_id = #{id}
+    </delete>
+
+    <select id="getByBillId" resultType="net.chensee.platform.erp.action.product.vo.ProductOutputVo">
+        select po.*, p.name as productName, pt.id as productTypeId, pt.name as productTypeName, ptm.model_name AS productModel
+        from t_product_output po
+        left join t_product p on po.product_id = p.id
+        left join t_product_type pt on pt.id = p.type_id
+        left join t_product_type_model ptm on p.model = ptm.id
+        where po.output_bill_id = #{billId} and po.status = 0
+    </select>
+</mapper>

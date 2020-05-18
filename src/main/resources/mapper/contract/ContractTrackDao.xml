@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.contract.mapper.ContractTrackDao">
+    <insert id="addContractTrack" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_contract_track
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contractId!=null"> `contract_id`,</if>
+            <if test="name!=null"> `name`,</if>
+            <if test="performManId!=null"> `perform_man_id`,</if>
+            <if test="processStatus!=null"> `process_status`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="index!=null"> `index`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contractId!=null"> #{contractId,jdbcType=INTEGER},</if>
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="performManId!=null"> #{performManId,jdbcType=INTEGER},</if>
+            <if test="processStatus!=null"> #{processStatus,jdbcType=VARCHAR},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="index!=null"> #{index,jdbcType=INTEGER},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateContractTrack"  parameterType="INTEGER">
+        UPDATE t_contract_track
+        <trim prefix="set" suffixOverrides=",">
+            <if test="contractId!=null"> contract_id=#{contractId},</if>
+            <if test="name!=null"> name=#{name},</if>
+            <if test="performManId!=null"> perform_man_id=#{performManId},</if>
+            <if test="processStatus!=null"> process_status=#{processStatus},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="index!=null"> index=#{index},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{status},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByContractId">
+        delete from t_contract_track WHERE contract_id = #{contractId}
+    </delete>
+
+    <delete id="deleteRedundancy">
+        delete from t_contract_track WHERE contract_id = #{contractId} and id not in
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getByContractId" resultType="net.chensee.platform.erp.action.contract.vo.ContractTrackVo">
+        select t.*, u.real_name as performManName
+        from t_contract_track t
+        left join tb_user u on t.perform_man_id = u.id
+        where t.contract_id = #{contractId} order by t.index asc
+    </select>
+</mapper>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.order.mapper.OrderContractDao">
+    <insert id="addOrderContract" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_order_contract
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId!=null"> `order_id`,</if>
+            <if test="type!=null"> `type_`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId!=null"> #{orderId,jdbcType=INTEGER},</if>
+            <if test="type!=null"> #{type,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOrderContract"  parameterType="INTEGER">
+        UPDATE t_order_contract
+        <trim prefix="set" suffixOverrides=",">
+            <if test="orderId!=null"> order_id=#{orderId},</if>
+            <if test="type!=null"> type=#{type},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteOrderContract">
+        UPDATE t_order_contract set status = 1 WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByOrderId">
+        UPDATE t_order_contract set status = 1 WHERE order_id = #{id}
+    </delete>
+
+    <select id="getByOrderId" resultType="net.chensee.platform.erp.action.order.vo.OrderContractVo">
+        select * from t_order_contract where status = 0 and order_id = #{orderId}
+    </select>
+
+    <select id="getById" resultType="net.chensee.platform.erp.action.order.po.OrderContractPo">
+        select * from t_order_contract where status = 0 and id = #{id}
+    </select>
+</mapper>

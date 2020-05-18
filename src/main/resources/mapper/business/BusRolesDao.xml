@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.business.mapper.BusRolesDao">
+    <select id="getBusinessRoles" resultType="net.chensee.platform.erp.action.business.vo.BusinessRoleVo">
+        select br2.*,btr.role_id as roleid,r.name as rolename
+	    from
+	    (select br.* from tb_business br where br.status = 0 limit #{pageStart},#{pageSize}) br2
+	    left join tb_business_to_role btr on btr.business_id = br2.id
+	    left join tb_role r on r.id = btr.role_id and r.status = 0
+	    where br2.status = 0
+    </select>
+
+    <select id="getRolesByName" resultType="net.chensee.platform.erp.action.business.vo.BusinessRoleVo">
+        select br2.*,btr.role_id as roleid,r.name as rolename
+        from
+        (select br.* from tb_business br
+        <where>
+            <if test="name!= null">
+                and br.business_name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and br.status = 0
+            </if>
+        </where>
+        limit #{pageStart},#{pageSize}) br2
+        left join tb_business_to_role btr on btr.business_id = br2.id
+        left join tb_role r on r.id = btr.role_id and r.status = 0
+    </select>
+
+    <select id="getCountBusRoles" resultType="java.lang.Integer">
+        select count(*) from tb_business
+        <where>
+            <if test="name!= null">
+                and business_name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and status = 0
+            </if>
+        </where>
+    </select>
+
+    <select id="getRolesByPath" resultType="net.chensee.platform.erp.action.business.vo.BusinessRoleVo">
+        select br.*,r.name as roleName, r.id as roleId
+        from tb_business br
+        left join tb_business_to_role btr on btr.business_id = br.id
+        left join tb_role r on r.id = btr.role_id
+        where br.status = 0 and r.status = 0 and br.business_path = #{path}
+    </select>
+
+    <select id="getBusRoleRelation" resultType="net.chensee.platform.erp.action.business.vo.BusinessRoleVo">
+        select btr.*,r.name as rolename from tb_business_to_role btr
+        left join tb_role r on r.id = btr.role_id
+        where r.status = 0 and btr.business_id = #{busRoleId} limit #{pageStart},#{pageSize}
+    </select>
+
+    <select id="getCountBusRoleRelation" resultType="java.lang.Integer">
+        select count(*) as rolename from tb_business_to_role btr
+        left join tb_role r on r.id = btr.role_id
+        where r.status = 0 and btr.business_id = #{busRoleId}
+    </select>
+
+    <insert id="addBusinessRole" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO tb_business
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessName!=null">`business_name`,</if>
+            <if test="businessCode!=null">`business_code`,</if>
+            <if test="businessPath!=null">`business_path`,</if>
+            <if test="createTime!=null">`create_time`,</if>
+            <if test="createBy!=null">`create_by`,</if>
+            <if test="updateTime!=null">`update_time`,</if>
+            <if test="updateBy!=null">`update_by`,</if>
+            <if test="status!=null">`status`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessName!=null">#{businessName,jdbcType=VARCHAR},</if>
+            <if test="businessCode!=null">#{businessCode,jdbcType=VARCHAR},</if>
+            <if test="businessPath!=null">#{businessPath,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null">#{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null">#{createBy,jdbcType=BIGINT},</if>
+            <if test="updateTime!=null">#{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null">#{updateBy,jdbcType=BIGINT},</if>
+            <if test="status!=null">#{status,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBusinessRole" parameterType="LONG">
+        UPDATE tb_business
+        <trim prefix="set" suffixOverrides=",">
+            <if test="businessName!=null">business_name=#{businessName},</if>
+            <if test="businessCode!=null">business_code=#{businessCode},</if>
+            <if test="businessPath!=null">business_path=#{businessPath},</if>
+            <if test="updateTime!=null">update_time=#{updateTime},</if>
+            <if test="updateBy!=null">update_by=#{updateBy},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteBusinessRole">
+         update tb_business set status = 1 where id = #{id} and is_built_in = 0
+    </update>
+
+    <insert id="addBusRoleRelation">
+        insert into tb_business_to_role
+        (business_id, role_id)
+        values
+        (#{id}, #{roleId})
+    </insert>
+
+    <insert id="allotBusinessRole">
+        insert into tb_business_to_role
+        (business_id, role_id)
+        values
+        <foreach collection="roleIds" item="roleId" separator=",">
+            (#{businessId}, #{roleId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteBusRoleInfos">
+        delete from tb_business_to_role
+        where business_id = #{businessId}
+    </delete>
+
+    <delete id="delBusRoleRelation">
+        delete from tb_business_to_role
+        where business_id = #{businessId} and role_id = #{roleId}
+    </delete>
+</mapper>

@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.finance.mapper.BillDao">
+    <insert id="addBill" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_bill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number!=null"> `number`,</if>
+            <if test="contractId!=null"> `contract_id`,</if>
+            <if test="firstPartyId!=null"> `first_party_id`,</if>
+            <if test="secondPartyId!=null"> `second_party_id`,</if>
+            <if test="billTime!=null"> `bill_time`,</if>
+            <if test="totalAmount!=null"> `total_amount`,</if>
+            <if test="totalTaxAmount!=null"> `total_tax_amount`,</if>
+            <if test="chineseAmount!=null"> `chinese_amount`,</if>
+            <if test="numeralAmount!=null"> `numeral_amount`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="payeeId!=null"> `payee_id`,</if>
+            <if test="approvalId!=null"> `approval_id`,</if>
+            <if test="billToParty!=null"> `bill_to_party`,</if>
+            <if test="direct!=null"> `direct`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+            <if test="orderId!=null"> `order_id`,</if>
+            <if test="isApprove!=null"> `is_approve`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number!=null">  #{number,jdbcType=VARCHAR},</if>
+            <if test="contractId!=null">  #{contractId,jdbcType=INTEGER},</if>
+            <if test="firstPartyId!=null"> #{firstPartyId,jdbcType=INTEGER},</if>
+            <if test="secondPartyId!=null"> #{secondPartyId,jdbcType=INTEGER},</if>
+            <if test="billTime!=null">  #{billTime,jdbcType=TIMESTAMP},</if>
+            <if test="totalAmount!=null">  #{totalAmount,jdbcType=INTEGER},</if>
+            <if test="totalTaxAmount!=null">  #{totalTaxAmount,jdbcType=INTEGER},</if>
+            <if test="chineseAmount!=null">  #{chineseAmount,jdbcType=VARCHAR},</if>
+            <if test="numeralAmount!=null">  #{numeralAmount,jdbcType=INTEGER},</if>
+            <if test="remark!=null">  #{remark,jdbcType=VARCHAR},</if>
+            <if test="payeeId!=null">  #{payeeId,jdbcType=INTEGER},</if>
+            <if test="approvalId!=null">  #{approvalId,jdbcType=INTEGER},</if>
+            <if test="billToParty!=null"> #{billToParty,jdbcType=VARCHAR},</if>
+            <if test="direct!=null"> #{direct,jdbcType=INTEGER},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+            <if test="orderId!=null"> #{orderId,jdbcType=INTEGER},</if>
+            <if test="isApprove!=null"> #{isApprove,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <select id="getAllBill" resultType="net.chensee.platform.erp.action.finance.vo.BillVo">
+        <if test="direct == 1">
+            select b.*, c.id as contractId, c.number as contractNumber, ct.id as firstPartyId,
+            ct.name as firstPartyName, cf.taxpayer_code as firstPartyTaxpayerCode, cf.addr_phone as firstPartyAddrPhone,
+            cf.bank_account as firstPartyBankAccount, d.id as secondPartyId, d.name as secondPartyName,
+            d.name as secondPartyTaxpayerCode, d.name as secondPartyAddrPhone,
+            d.name as secondPartyBankAccount, up.id as payeeId, up.real_name as payeeName,
+            ua.id as approvalId, ua.real_name as approvalName
+            from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_customer ct on b.first_party_id = ct.id
+            left join t_financial_info cf on cf.customer_id = ct.id
+            left join tb_dept d on d.id = b.second_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+            where b.status = 0 and b.direct = #{direct} order by b.update_time desc limit #{pageStart}, #{pageSize}
+        </if>
+        <if test="direct == -1">
+            select b.*, c.id as contractId, c.number as contractNumber, ct.id as secondPartyId,
+            ct.name as secondPartyName, cf.taxpayer_code as secondPartyTaxpayerCode, cf.addr_phone as secondPartyAddrPhone,
+            cf.bank_account as secondPartyBankAccount, d.id as firstPartyId, d.name as firstPartyName,
+            d.name as firstPartyTaxpayerCode, d.name as firstPartyAddrPhone,
+            d.name as firstPartyBankAccount, up.id as payeeId, up.real_name as payeeName,
+            ua.id as approvalId, ua.real_name as approvalName
+            from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_supplier ct on b.second_party_id = ct.id
+            left join t_financial_info cf on cf.supplier_id = ct.id
+            left join tb_dept d on d.id = b.first_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+            where b.status = 0 and b.direct = #{direct} order by b.update_time desc limit #{pageStart}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="getByOtherPartyNameAndNumber" resultType="net.chensee.platform.erp.action.finance.vo.BillVo">
+        <if test="direct == 1">
+            select b.*, c.id as contractId, c.number as contractNumber, ct.id as firstPartyId,
+            ct.name as firstPartyName, cf.taxpayer_code as firstPartyTaxpayerCode, cf.addr_phone as firstPartyAddrPhone,
+            cf.bank_account as firstPartyBankAccount, d.id as secondPartyId, d.name as secondPartyName,
+            d.name as secondPartyTaxpayerCode, d.name as secondPartyAddrPhone,
+            d.name as secondPartyBankAccount, up.id as payeeId, up.real_name as payeeName,
+            ua.id as approvalId, ua.real_name as approvalName
+            from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_customer ct on b.first_party_id = ct.id
+            left join t_financial_info cf on cf.customer_id = ct.id
+            left join tb_dept d on d.id = b.second_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+            <where>
+                <if test="otherPartyName != null">
+                    and ct.name like concat('%', #{otherPartyName,jdbcType=VARCHAR},'%')
+                </if>
+                <if test="number != null">
+                    and b.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+                </if>
+                <if test="true">
+                    and b.status = 0 and b.direct = #{direct}
+                </if>
+            </where>
+            order by b.update_time desc limit #{pageStart}, #{pageSize}
+        </if>
+        <if test="direct == -1">
+            select b.*, c.id as contractId, c.number as contractNumber, ct.id as secondPartyId,
+            ct.name as secondPartyName, cf.taxpayer_code as secondPartyTaxpayerCode, cf.addr_phone as secondPartyAddrPhone,
+            cf.bank_account as secondPartyBankAccount, d.id as firstPartyId, d.name as firstPartyName,
+            d.name as firstPartyTaxpayerCode, d.name as firstPartyAddrPhone,
+            d.name as firstPartyBankAccount, up.id as payeeId, up.real_name as payeeName,
+            ua.id as approvalId, ua.real_name as approvalName
+            from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_supplier ct on b.second_party_id = ct.id
+            left join t_financial_info cf on cf.supplier_id = ct.id
+            left join tb_dept d on d.id = b.first_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+            <where>
+                <if test="otherPartyName != null">
+                    and ct.name like concat('%', #{otherPartyName,jdbcType=VARCHAR},'%')
+                </if>
+                <if test="number != null">
+                    and b.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+                </if>
+                <if test="true">
+                    and b.status = 0 and b.direct = #{direct}
+                </if>
+            </where>
+            order by b.update_time desc limit #{pageStart}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="getByContractId" resultType="net.chensee.platform.erp.action.finance.vo.BillVo">
+        <if test="direct == 1">
+            select b.*, c.id as contractId, c.number as contractNumber, ct.id as firstPartyId,
+            ct.name as firstPartyName, cf.taxpayer_code as firstPartyTaxpayerCode, cf.addr_phone as firstPartyAddrPhone,
+            cf.bank_account as firstPartyBankAccount, d.id as secondPartyId, d.name as secondPartyName,
+            d.name as secondPartyTaxpayerCode, d.name as secondPartyAddrPhone,
+            d.name as secondPartyBankAccount, up.id as payeeId, up.real_name as payeeName,
+            ua.id as approvalId, ua.real_name as approvalName
+            from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_customer ct on b.first_party_id = ct.id
+            left join t_financial_info cf on cf.customer_id = ct.id
+            left join tb_dept d on d.id = b.second_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+        </if>
+        <if test="direct == -1">
+            select b.*, c.id as contractId, c.number as contractNumber, ct.id as secondPartyId,
+            ct.name as secondPartyName, cf.taxpayer_code as secondPartyTaxpayerCode, cf.addr_phone as secondPartyAddrPhone,
+            cf.bank_account as secondPartyBankAccount, d.id as firstPartyId, d.name as firstPartyName,
+            d.name as firstPartyTaxpayerCode, d.name as firstPartyAddrPhone,
+            d.name as firstPartyBankAccount, up.id as payeeId, up.real_name as payeeName,
+            ua.id as approvalId, ua.real_name as approvalName
+            from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_supplier ct on b.second_party_id = ct.id
+            left join t_financial_info cf on cf.supplier_id = ct.id
+            left join tb_dept d on d.id = b.first_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+        </if>
+        <where>
+            <if test="contractId != null">
+                and c.id = #{contractId,jdbcType=INTEGER}
+            </if>
+            <if test="true">
+                and b.status = 0
+            </if>
+        </where>
+        order by b.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <select id="getReceiveById" resultType="net.chensee.platform.erp.action.finance.vo.BillVo">
+        select b.*, c.id as contractid, c.number as contractnumber,
+        ct.id as firstpartyid,ct.name as firstpartyname,
+	    cfc.taxpayer_code as firstpartytaxpayercode, cfc.addr_phone as firstpartyaddrphone,
+	    cfc.bank_account as firstpartybankaccount,
+	    st.id as secondpartyid, st.name as secondpartyname,
+        cfs.taxpayer_code as firstpartytaxpayercode, cfs.addr_phone as firstpartyaddrphone,
+        cfs.bank_account as firstpartybankaccount,
+        up.id as payeeid, up.real_name as payeename,
+        ua.id as approvalid, ua.real_name as approvalname
+        from t_bill b
+        left join t_contract c on b.contract_id = c.id
+        left join t_customer ct on b.first_party_id = ct.id
+        left join t_supplier st on b.second_party_id = st.id
+        left join t_financial_info cfc on cfc.customer_id = ct.id
+        left join t_financial_info cfs on cfs.supplier_id = st.id
+        left join tb_user up on b.payee_id = up.id
+        left join tb_user ua on b.approval_id = ua.id
+        where b.id = #{id} and b.status = 0
+    </select>
+
+    <select id="getPayById" resultType="net.chensee.platform.erp.action.finance.vo.BillVo">
+        select b.*, c.id as contractId, c.number as contractNumber, ct.id as secondPartyId,
+        ct.name as secondPartyName, cf.taxpayer_code as secondPartyTaxpayerCode, cf.addr_phone as secondPartyAddrPhone,
+        cf.bank_account as secondPartyBankAccount, d.id as firstPartyId, d.name as firstPartyName,
+        d.name as firstPartyTaxpayerCode, d.name as firstPartyAddrPhone,
+        d.name as firstPartyBankAccount, up.id as payeeId, up.real_name as payeeName,
+        ua.id as approvalId, ua.real_name as approvalName
+        from t_bill b
+        left join t_contract c on b.contract_id = c.id
+        left join t_supplier ct on b.second_party_id = ct.id
+        left join t_financial_info cf on cf.supplier_id = ct.id
+        left join tb_dept d on d.id = b.first_party_id
+        left join tb_user up on b.payee_id = up.id
+        left join tb_user ua on b.approval_id = ua.id
+        where b.id = #{id} and b.status = 0
+    </select>
+
+    <update id="updateBill"  parameterType="INTEGER">
+        UPDATE t_bill
+        <trim prefix="set" suffixOverrides=",">
+            <if test="number!=null"> number=#{number},</if>
+            <if test="contractId!=null"> contract_id=#{contractId},</if>
+            <if test="firstPartyId!=null"> first_party_id=#{firstPartyId},</if>
+            <if test="secondPartyId!=null"> second_party_id=#{secondPartyId},</if>
+            <if test="billTime!=null"> bill_time=#{billTime},</if>
+            <if test="totalAmount!=null"> total_amount=#{totalAmount},</if>
+            <if test="totalTaxAmount!=null"> total_tax_amount=#{totalTaxAmount},</if>
+            <if test="chineseAmount!=null"> chinese_amount=#{chineseAmount},</if>
+            <if test="numeralAmount!=null"> numeral_amount=#{numeralAmount},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="payeeId!=null"> payee_id=#{payeeId},</if>
+            <if test="approvalId!=null"> approval_id=#{approvalId},</if>
+            <if test="billToParty!=null"> bill_to_party=#{billToParty},</if>
+            <if test="direct!=null"> direct=#{direct},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteBill">
+        UPDATE t_bill set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select resultType="Integer" id="getCount">
+        <if test="direct == 1">
+            select count(1) from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_customer ct on b.first_party_id = ct.id
+            left join t_financial_info cf on cf.customer_id = ct.id
+            left join tb_dept d on d.id = b.second_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+            <where>
+                <if test="otherPartyName != null">
+                    and ct.name like concat('%', #{otherPartyName,jdbcType=VARCHAR},'%')
+                </if>
+                <if test="number != null">
+                    and b.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+                </if>
+                <if test="true">
+                    and b.status = 0 and b.direct = #{direct}
+                </if>
+                <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                    and
+                    b.folder_id in
+                    <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                        #{id}
+                    </foreach>
+                </if>
+            </where>
+        </if>
+        <if test="direct == -1">
+            select count(1) from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_supplier ct on b.second_party_id = ct.id
+            left join t_financial_info cf on cf.supplier_id = ct.id
+            left join tb_dept d on d.id = b.first_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+            <where>
+                <if test="otherPartyName != null">
+                    and ct.name like concat('%', #{otherPartyName,jdbcType=VARCHAR},'%')
+                </if>
+                <if test="number != null">
+                    and b.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+                </if>
+                <if test="true">
+                    and b.status = 0 and b.direct = #{direct}
+                </if>
+                <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                    and
+                    b.folder_id in
+                    <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                        #{id}
+                    </foreach>
+                </if>
+            </where>
+        </if>
+    </select>
+
+    <select resultType="Integer" id="getCountByContractId">
+        <if test="direct == 1">
+            select count(1) from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_customer ct on b.first_party_id = ct.id
+            left join t_financial_info cf on cf.customer_id = ct.id
+            left join tb_dept d on d.id = b.second_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+        </if>
+        <if test="direct == -1">
+            select count(1) from t_bill b
+            left join t_contract c on b.contract_id = c.id
+            left join t_supplier ct on b.second_party_id = ct.id
+            left join t_financial_info cf on cf.supplier_id = ct.id
+            left join tb_dept d on d.id = b.first_party_id
+            left join tb_user up on b.payee_id = up.id
+            left join tb_user ua on b.approval_id = ua.id
+        </if>
+        <where>
+            <if test="contractId != null">
+                and c.id = #{contractId,jdbcType=INTEGER}
+            </if>
+            <if test="true">
+                and b.status = 0
+            </if>
+        </where>
+    </select>
+</mapper>

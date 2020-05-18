@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.dispatch.mapper.DispatchDao">
+    <insert id="addDispatchSheet" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_dispatch_sheet
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerId!=null"> `customer_id`,</if>
+            <if test="orderId!=null"> `order_id`,</if>
+            <if test="contractId!=null"> `contract_id`,</if>
+            <if test="linkmanId!=null"> `linkman_id`,</if>
+            <if test="theme!=null"> `theme`,</if>
+            <if test="saleStatus!=null"> `sale_status`,</if>
+            <if test="customerLevel!=null"> `customer_level`,</if>
+            <if test="grade!=null"> `grade`,</if>
+            <if test="dispatchStatus!=null"> `dispatch_status`,</if>
+            <if test="approvalId!=null"> `approval_id`,</if>
+            <if test="phone!=null"> `phone`,</if>
+            <if test="stage!=null"> `stage`,</if>
+            <if test="serviceStage!=null"> `service_stage`,</if>
+            <if test="workTime!=null"> `work_time`,</if>
+            <if test="finishTime!=null"> `finish_time`,</if>
+            <if test="resource!=null"> `resource`,</if>
+            <if test="desc!=null"> `desc_`,</if>
+            <if test="satisfied!=null"> `satisfied`,</if>
+            <if test="resultInfo!=null"> `result_info`,</if>
+            <if test="approvalStatus!=null"> `approval_status`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+            <if test="fileIds!=null"> `file_ids`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerId!=null"> #{customerId,jdbcType=INTEGER},</if>
+            <if test="orderId!=null"> #{orderId,jdbcType=INTEGER},</if>
+            <if test="contractId!=null"> #{contractId,jdbcType=INTEGER},</if>
+            <if test="linkmanId!=null"> #{linkmanId,jdbcType=INTEGER},</if>
+            <if test="theme!=null"> #{theme,jdbcType=VARCHAR},</if>
+            <if test="saleStatus!=null"> #{saleStatus,jdbcType=VARCHAR},</if>
+            <if test="customerLevel!=null"> #{customerLevel,jdbcType=VARCHAR},</if>
+            <if test="grade!=null"> #{grade,jdbcType=INTEGER},</if>
+            <if test="dispatchStatus!=null"> #{dispatchStatus,jdbcType=VARCHAR},</if>
+            <if test="approvalId!=null"> #{approvalId,jdbcType=INTEGER},</if>
+            <if test="phone!=null"> #{phone,jdbcType=VARCHAR},</if>
+            <if test="stage!=null"> #{stage,jdbcType=VARCHAR},</if>
+            <if test="serviceStage!=null"> #{serviceStage,jdbcType=VARCHAR},</if>
+            <if test="workTime!=null"> #{workTime,jdbcType=TIMESTAMP},</if>
+            <if test="finishTime!=null"> #{finishTime,jdbcType=TIMESTAMP},</if>
+            <if test="resource!=null"> #{resource,jdbcType=VARCHAR},</if>
+            <if test="desc!=null"> #{desc,jdbcType=VARCHAR},</if>
+            <if test="satisfied!=null"> #{satisfied,jdbcType=INTEGER},</if>
+            <if test="resultInfo!=null"> #{resultInfo,jdbcType=VARCHAR},</if>
+            <if test="approvalStatus!=null"> #{approvalStatus,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+            <if test="fileIds!=null"> #{fileIds,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <select id="getAllDispatchSheet" resultType="net.chensee.platform.erp.action.dispatch.vo.DispatchSheetVo">
+        select ds.*, c.id as customerId, c.name as customerName, c.number as customerNumber,
+        o.id as orderId, o.name as orderName, u1.id as linkmanId, u1.name as linkmanName,
+        ct.id as contractId, ct.name as contractName, ct.number as contractNumber
+        from t_dispatch_sheet ds
+        left join t_customer c on ds.customer_id = c.id
+        left join t_order o on ds.order_id = o.id
+        left join t_contract ct on ds.contract_id = ct.id
+        left join t_linkman u1 on ds.linkman_id = u1.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                ds.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and ds.status = 0 order by ds.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateDispatchSheet"  parameterType="INTEGER">
+        UPDATE t_dispatch_sheet
+        <trim prefix="set" suffixOverrides=",">
+            <if test="customerId!=null"> customer_id=#{customerId},</if>
+            <if test="orderId!=null"> order_id=#{orderId},</if>
+            <if test="contractId!=null"> contract_id=#{contractId},</if>
+            <if test="linkmanId!=null"> linkman_id=#{linkmanId},</if>
+            <if test="theme!=null"> theme=#{theme},</if>
+            <if test="saleStatus!=null"> sale_status=#{saleStatus},</if>
+            <if test="customerLevel!=null"> customer_level=#{customerLevel},</if>
+            <if test="grade!=null"> grade=#{grade},</if>
+            <if test="dispatchStatus!=null"> dispatch_status=#{dispatchStatus},</if>
+            <if test="approvalId!=null"> approval_id=#{approvalId},</if>
+            <if test="phone!=null"> phone=#{phone},</if>
+            <if test="stage!=null"> stage=#{stage},</if>
+            <if test="serviceStage!=null"> service_stage=#{serviceStage},</if>
+            <if test="workTime!=null"> work_time=#{workTime},</if>
+            <if test="finishTime!=null"> finish_time=#{finishTime},</if>
+            <if test="resource!=null"> resource=#{resource},</if>
+            <if test="desc!=null"> desc_=#{desc},</if>
+            <if test="satisfied!=null"> satisfied=#{satisfied},</if>
+            <if test="resultInfo!=null"> result_info=#{resultInfo},</if>
+            <if test="approvalStatus!=null"> approval_status=#{approvalStatus},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+            <if test="fileIds!=null"> file_ids=#{fileIds},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteDispatchSheet">
+        UPDATE t_dispatch_sheet set status = 1 WHERE id = #{id}
+    </delete>
+    <select id="getDispatchSheetByCustomers" resultType="net.chensee.platform.erp.action.dispatch.vo.DispatchSheetVo">
+        select ds.*, c.id as customerId, c.name as customerName, c.number as customerNumber,
+        o.id as orderId, o.name as orderName, u1.id as linkmanId, u1.name as linkmanName,
+        ct.id as contractId, ct.name as contractName, ct.number as contractNumber
+        from t_dispatch_sheet ds
+        left join t_customer c on ds.customer_id = c.id
+        left join t_order o on ds.order_id = o.id
+        left join t_contract ct on ds.contract_id = ct.id
+        left join t_linkman u1 on ds.linkman_id = u1.id
+        <where>
+            <if test="customerName != null">
+                and c.name like concat('%', #{customerName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="customerNo != null">
+                and c.number like concat('%', #{customerNo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and ds.status = 0
+            </if>
+        </where>
+        order by ds.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <select id="getById" resultType="net.chensee.platform.erp.action.dispatch.vo.DispatchSheetVo">
+        select ds.*, c.id as customerId, c.name as customerName, c.number as customerNumber,
+        o.id as orderId, o.name as orderName, u1.id as linkmanId, u1.name as linkmanName,
+        ct.id as contractId, ct.name as contractName, ct.number as contractNumber
+        from t_dispatch_sheet ds
+        left join t_customer c on ds.customer_id = c.id
+        left join t_order o on ds.order_id = o.id
+        left join t_contract ct on ds.contract_id = ct.id
+        left join t_linkman u1 on ds.linkman_id = u1.id
+        where ds.id = #{id}
+    </select>
+
+    <select resultType="Integer" id="getCount">
+        select count(1)
+        from t_dispatch_sheet ds
+        left join t_customer c on ds.customer_id = c.id
+        left join t_order o on ds.order_id = o.id
+        left join t_contract ct on ds.contract_id = ct.id
+        left join t_linkman u1 on ds.linkman_id = u1.id
+        <where>
+            <if test="customerName != null">
+                and c.name like concat('%', #{customerName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="customerNo != null">
+                and c.number like concat('%', #{customerNo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and ds.status = 0
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                ds.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

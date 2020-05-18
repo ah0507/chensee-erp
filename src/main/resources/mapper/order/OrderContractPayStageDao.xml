@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.order.mapper.OrderContractPayStageDao">
+    <insert id="addOrderContractPayStage" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_order_contract_pay_stage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> `name`,</if>
+            <if test="rate!=null"> `rate`,</if>
+            <if test="amount!=null"> `amount`,</if>
+            <if test="orderId!=null"> `order_id`,</if>
+            <if test="orderContractId!=null"> `order_contract_id`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="rate!=null"> #{rate,jdbcType=INTEGER},</if>
+            <if test="amount!=null"> #{amount,jdbcType=INTEGER},</if>
+            <if test="orderId!=null"> #{orderId,jdbcType=INTEGER},</if>
+            <if test="orderContractId!=null"> #{orderContractId,jdbcType=INTEGER},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOrderContractPayStage"  parameterType="INTEGER">
+        UPDATE t_order_contract_pay_stage
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null"> name=#{name},</if>
+            <if test="rate!=null"> rate=#{rate},</if>
+            <if test="amount!=null"> amount=#{amount},</if>
+            <if test="orderId!=null"> order_id=#{orderId},</if>
+            <if test="orderContractId!=null"> order_contract_id=#{orderContractId},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteOrderContractPayStage">
+        UPDATE t_order_contract_pay_stage set status = 1 WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByOrderId">
+        UPDATE t_order_contract_pay_stage set status = 1 WHERE order_id = #{id}
+    </delete>
+
+    <select id="getByContractId" resultType="net.chensee.platform.erp.action.order.vo.OrderContractPayStageVo">
+        select * from t_order_contract_pay_stage where status = 0 and order_contract_id = #{contractId}
+    </select>
+
+    <select id="getPoByContractId" resultType="net.chensee.platform.erp.action.order.po.OrderContractPayStagePo">
+        select * from t_order_contract_pay_stage where status = 0 and order_contract_id = #{contractId}
+    </select>
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="net.chensee.platform.erp.action.file.mapper.FileDao">
+    <select id="isExistFile" resultType="net.chensee.platform.erp.action.file.po.FileInfoPo">
+        select * from t_file_info
+        where document = #{document}
+        and opr=1
+        limit 1;
+    </select>
+    <select id="getFileInfo" resultType="net.chensee.platform.erp.action.file.po.FileInfoPo">
+        select * from t_file_info
+        where id = #{id}
+        and opr=1
+    </select>
+    <select id="isExistDocs" resultType="net.chensee.platform.erp.action.file.po.FileInfoPo">
+        select * from t_file_info t
+        where document = (select document
+                          from t_file_info
+                          where  id = #{id}
+                          and opr=1
+                          ) and opr=1
+        limit 2
+    </select>
+
+    <insert id="saveFileInfo">
+        insert into t_file_info
+        (id,user_Id,path,original_name,file_type,document,status,opr,create_time,create_by)
+        values
+        (#{id},#{userId},#{path},#{originalName},#{fileType},#{document},#{status},#{opr},#{createTime},#{createBy})
+    </insert>
+    <delete id="deleteFile" parameterType="string">
+        delete from t_file_info
+        where id=#{id}
+    </delete>
+    <update id="removeFileByOpr">
+        update t_file_info
+        set opr=#{opr}
+        where id=#{id}
+    </update>
+    <update id="setFileStatus">
+        update t_file_info
+        set status=#{status}
+        where id=#{id}
+    </update>
+</mapper>

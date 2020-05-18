@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.indexConfig.mapper.IndexConfigDao">
+
+    <insert id="saveIndexInfoPo" keyProperty="id" useGeneratedKeys="true">
+        insert into t_index_info
+        (title,user_id,role_id,dept_id,create_time,create_by,status)
+        values
+        (#{title},#{userId},#{roleId},#{deptId},#{createTime},#{createBy},#{status})
+    </insert>
+    <insert id="saveIndexConfigPo">
+        insert into t_index_config
+        (title,class_name,icon,code,columns,page_size,index_id,create_time,create_by,status)
+        values
+        (#{title},#{className},#{icon},#{code},#{columns},#{pageSize},#{indexId},#{createTime},#{createBy},#{status})
+    </insert>
+    <insert id="insertUserToIndexPo">
+        insert into tb_user_to_index
+        (user_id,index_id)
+        values
+        (#{userId},#{indexId})
+    </insert>
+    <update id="delIndexInfo">
+        update t_index_info
+        set status=0
+        where id=#{indexId}
+    </update>
+    <update id="delIndexConfigPo">
+        update t_index_config
+        set status=0
+        where index_id=#{indexId}
+    </update>
+    <update id="updateUserToIndexPo">
+        update tb_user_to_index
+        set index_id=#{indexId}
+        where user_id=#{userId}
+    </update>
+
+    <select id="getIndexConfigPosByIndexId"
+            resultType="net.chensee.platform.erp.action.indexConfig.po.IndexConfigPo">
+        select * from t_index_config
+        where index_id=#{indexId}
+        and status=1
+    </select>
+    <select id="getUserIndex" resultType="net.chensee.platform.erp.action.indexConfig.po.UserToIndexPo">
+        select * from tb_user_to_index
+        where user_id=#{userId}
+    </select>
+    <select id="getIndexInfoPoByIndexId"
+            resultType="net.chensee.platform.erp.action.indexConfig.po.IndexInfoPo">
+         select * from t_index_info
+         where id=#{indexId}
+         and status=1
+    </select>
+    <select id="getIndexInfosByUser" resultType="net.chensee.platform.erp.action.indexConfig.po.IndexInfoPo">
+        select * from t_index_info
+         where user_id=#{userId}
+         and status=1
+    </select>
+    <select id="getUserIndexConfig" resultType="net.chensee.platform.erp.action.indexConfig.po.IndexInfoPo">
+        select * from t_index_info
+         <where>
+             status=1
+             <if test="userId!=null">
+                 and user_id=#{userId}
+             </if>
+             <if test="roleIds!=null and roleIds.size()!=0">
+                 or role_id in
+                 <foreach collection="roleIds" item="roleId" index="index" separator="," open="(" close=")">
+                     #{roleId}
+                 </foreach>
+             </if>
+             <if test="deptIds!=null and deptIds.size()!=0">
+                 or dept_id in
+                 <foreach collection="deptIds" item="deptId" index="index" separator="," open="(" close=")">
+                     #{deptId}
+                 </foreach>
+             </if>
+             order by create_time desc
+             limit 1
+         </where>
+    </select>
+    <select id="getIndexInfosByRole" resultType="net.chensee.platform.erp.action.indexConfig.po.IndexInfoPo">
+        select * from t_index_info
+        <where>
+            status = 1
+            <if test="roleIds!=null and roleIds.size()!=0">
+                and role_id in
+                <foreach collection="roleIds" item="roleId" index="index" separator="," open="(" close=")">
+                    #{roleId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getIndexInfosByDept" resultType="net.chensee.platform.erp.action.indexConfig.po.IndexInfoPo">
+        select * from t_index_info
+        <where>
+            status = 1
+            <if test="deptIds!=null and deptIds.size()!=0">
+                and dept_id in
+                <foreach collection="deptIds" item="deptId" index="index" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getIndexInfoPage" resultType="net.chensee.platform.erp.action.indexConfig.po.IndexInfoPo">
+         select * from t_index_info
+         where status=1
+         limit #{pageNumber}, #{pageSize}
+    </select>
+    <select id="getIndexInfoCount" resultType="java.lang.Integer">
+        select count(*) from t_index_info
+         where status=1
+    </select>
+
+</mapper>

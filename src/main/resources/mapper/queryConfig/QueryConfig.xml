@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.queryConfig.mapper.QueryConfigDao">
+    <insert id="addQueryConfig">
+        insert into t_query_config
+        (custom_key,alias,type,path,create_time,create_by)
+        values
+        (#{customKey},#{alias},#{type},#{path},#{createTime},#{createBy})
+    </insert>
+    <update id="updateQueryConfig">
+        update t_query_config
+        set custom_key=#{customKey},alias=#{alias},type=#{type},path=#{path},update_time=#{updateTime},update_by=#{updateBy}
+        where id=#{id}
+    </update>
+    <delete id="delQueryConfig" parameterType="java.lang.Long">
+        delete from t_query_config where id=#{id}
+    </delete>
+
+    <select id="getQueryConfigPos" resultType="net.chensee.platform.erp.action.queryConfig.po.QueryConfigPo">
+        select * from t_query_config
+        where custom_key=#{customKey}
+        and path=#{classMethodName}
+    </select>
+    <select id="isExistQueryConfigPo" resultType="java.lang.Integer">
+        select count(*) from t_query_config
+        where custom_key=#{customKey}
+        and alias=#{alias}
+        and type=#{type}
+    </select>
+    <select id="getQueryConfigPage" resultType="net.chensee.platform.erp.action.queryConfig.po.QueryConfigPo">
+        select * from t_query_config
+        limit #{pageSize},#{pageNumber}
+    </select>
+    <select id="getQueryConfigCount" resultType="java.lang.Integer">
+        select count(*) from t_query_config
+    </select>
+    <select id="getQueryConfigAllPage"
+            resultType="net.chensee.platform.erp.action.queryConfig.po.QueryConfigPo">
+        select * from t_query_config_all
+        limit #{pageSize},#{pageNumber}
+    </select>
+    <select id="getQueryConfigAllCount" resultType="java.lang.Integer">
+        select count(*) from t_query_config_all
+    </select>
+</mapper>

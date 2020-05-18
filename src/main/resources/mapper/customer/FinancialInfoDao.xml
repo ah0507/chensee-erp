@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.customer.mapper.FinancialInfoDao">
+    <select id="getById" resultType="map">
+        select * from t_financial_info c where c.status = 0 and id = #{id}
+    </select>
+
+    <insert id="addFinancialInfo" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_financial_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> `name`,</if>
+            <if test="taxpayerCode!=null"> `taxpayer_code`,</if>
+            <if test="addrPhone!=null"> `addr_phone`,</if>
+            <if test="bankAccount!=null"> `bank_account`,</if>
+            <if test="customerId!=null"> `customer_id`,</if>
+            <if test="supplierId!=null"> `supplier_id`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="taxpayerCode!=null"> #{taxpayerCode,jdbcType=VARCHAR},</if>
+            <if test="addrPhone!=null"> #{addrPhone,jdbcType=VARCHAR},</if>
+            <if test="bankAccount!=null"> #{bankAccount,jdbcType=VARCHAR},</if>
+            <if test="customerId!=null"> #{customerId,jdbcType=INTEGER},</if>
+            <if test="supplierId!=null"> #{supplierId,jdbcType=INTEGER},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateFinancialInfo"  parameterType="INTEGER">
+        UPDATE t_financial_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null"> name=#{name},</if>
+            <if test="taxpayerCode!=null"> taxpayer_code=#{taxpayerCode},</if>
+            <if test="addrPhone!=null"> addr_phone=#{addrPhone},</if>
+            <if test="bankAccount!=null"> bank_account=#{bankAccount},</if>
+            <if test="customerId!=null"> customer_id=#{customerId},</if>
+            <if test="supplierId!=null"> supplier_id=#{supplierId},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteFinancialInfo">
+        UPDATE t_financial_info set status = 1 WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByCustomerId">
+        UPDATE t_financial_info set status = 1 WHERE customer_id = #{id}
+    </delete>
+
+    <delete id="deleteBySupplierId">
+        UPDATE t_financial_info set status = 1 WHERE supplier_id = #{id}
+    </delete>
+
+    <select id="getByCustomerId" resultType="net.chensee.platform.erp.action.customer.po.FinancialInfoPo">
+        select * from t_financial_info c where c.status = 0 and customer_id = #{id}
+    </select>
+
+    <select id="getBySupplierId" resultType="net.chensee.platform.erp.action.customer.po.FinancialInfoPo">
+        select * from t_financial_info c where c.status = 0 and supplier_id = #{id}
+    </select>
+</mapper>

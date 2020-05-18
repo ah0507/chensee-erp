@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.contract.mapper.ContractDao">
+    <select id="getAllContracts" resultType="net.chensee.platform.erp.action.contract.vo.ContractVo">
+        <if test="direct == 1">
+            select c.*, o.id as orderId, o.name as orderName, o.number as orderNumber,
+            ct.id as otherPartyId, ct.name as otherPartyName, u.id as saleManId,
+            u.real_name as saleManName, cl.id as otherPartyManId, cl.name as otherPartyManName,
+            cl.mobile_phone as otherPartyManPhone from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_customer ct on o.first_party_id = ct.id
+            left join tb_user u on o.second_party_man_id = u.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+        </if>
+        <if test="direct == -1">
+            select c.*, o.id as orderId, o.name as orderName, o.number as orderNumber,
+            ct.id as otherPartyId, ct.name as otherPartyName, u.id as saleManId,
+            u.real_name as saleManName, cl.id as otherPartyManId, cl.name as otherPartyManName,
+            cl.mobile_phone as otherPartyManPhone from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_supplier ct on o.second_party_id = ct.id
+            left join tb_user u on o.first_party_man_id = u.id
+            left join t_linkman cl on o.second_party_man_id = cl.id
+        </if>
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and c.status = 0
+            </if>
+            <if test="true">
+                and c.direct = #{direct} order by c.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByOrderNameAndContractNo" resultType="net.chensee.platform.erp.action.contract.vo.ContractVo">
+        <if test="direct == 1">
+            select c.*, o.id as orderId, o.name as orderName, o.number as orderNumber,
+            ct.id as otherPartyId, ct.name as otherPartyName, u.id as saleManId,
+            u.real_name as saleManName, cl.id as otherPartyManId, cl.name as otherPartyManName,
+            cl.mobile_phone as otherPartyManPhone from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_customer ct on o.first_party_id = ct.id
+            left join tb_user u on o.second_party_man_id = u.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+        </if>
+        <if test="direct == -1">
+            select c.*, o.id as orderId, o.name as orderName, o.number as orderNumber,
+            ct.id as otherPartyId, ct.name as otherPartyName, u.id as saleManId,
+            u.real_name as saleManName, cl.id as otherPartyManId, cl.name as otherPartyManName,
+            cl.mobile_phone as otherPartyManPhone from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_supplier ct on o.second_party_id = ct.id
+            left join tb_user u on o.first_party_man_id = u.id
+            left join t_linkman cl on o.second_party_man_id = cl.id
+        </if>
+        <where>
+            <if test="orderName != null">
+                and o.name like concat('%', #{orderName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="contractNo != null">
+                and c.number like concat('%', #{contractNo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and c.status = 0 and c.direct = #{direct}
+            </if>
+        </where>
+        order by c.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <select id="getByOtherPartyId" resultType="net.chensee.platform.erp.action.contract.vo.ContractVo">
+        <if test="direct == 1">
+            select c.*, o.id as orderId, o.name as orderName, o.number as orderNumber,
+            ct.id as otherPartyId, ct.name as otherPartyName, u.id as saleManId,
+            u.real_name as saleManName, cl.id as otherPartyManId, cl.name as otherPartyManName,
+            cl.mobile_phone as otherPartyManPhone from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_customer ct on o.first_party_id = ct.id
+            left join tb_user u on o.second_party_man_id = u.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+        </if>
+        <if test="direct == -1">
+            select c.*, o.id as orderId, o.name as orderName, o.number as orderNumber,
+            ct.id as otherPartyId, ct.name as otherPartyName, u.id as saleManId,
+            u.real_name as saleManName, cl.id as otherPartyManId, cl.name as otherPartyManName,
+            cl.mobile_phone as otherPartyManPhone from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_supplier ct on o.second_party_id = ct.id
+            left join tb_user u on o.first_party_man_id = u.id
+            left join t_linkman cl on o.second_party_man_id = cl.id
+        </if>
+        <where>
+            <if test="otherPartyId != null">
+                and ct.id = #{otherPartyId,jdbcType=INTEGER}
+            </if>
+            <if test="true">
+                and c.status = 0 and c.direct = #{direct}
+            </if>
+        </where>
+        order by c.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <insert id="addContract" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_contract
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> `name`,</if>
+            <if test="number!=null"> `number`,</if>
+            <if test="orderId!=null"> `order_id`,</if>
+            <if test="amount!=null"> `amount`,</if>
+            <if test="approvalStatus!=null"> `approval_status`,</if>
+            <if test="contractTime!=null"> `contract_time`,</if>
+            <if test="type!=null"> `type_`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="direct!=null"> `direct`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="number!=null"> #{number,jdbcType=VARCHAR},</if>
+            <if test="orderId!=null"> #{orderId,jdbcType=INTEGER},</if>
+            <if test="amount!=null"> #{amount,jdbcType=INTEGER},</if>
+            <if test="approvalStatus!=null"> #{approvalStatus,jdbcType=VARCHAR},</if>
+            <if test="contractTime!=null"> #{contractTime,jdbcType=TIMESTAMP},</if>
+            <if test="type!=null"> #{type,jdbcType=VARCHAR},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="direct!=null"> #{direct,jdbcType=INTEGER},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateContract"  parameterType="INTEGER">
+        UPDATE t_contract
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null"> name=#{name},</if>
+            <if test="number!=null"> number=#{number},</if>
+            <if test="orderId!=null"> order_id=#{orderId},</if>
+            <if test="amount!=null"> amount=#{amount},</if>
+            <if test="approvalStatus!=null"> approval_status=#{approvalStatus},</if>
+            <if test="contractTime!=null"> contract_time=#{contractTime},</if>
+            <if test="type!=null"> type_=#{type},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="direct!=null"> direct=#{direct},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteContract">
+        UPDATE t_contract set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select resultType="Integer" id="getCount">
+        <if test="direct == 1">
+            select count(1) from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_customer ct on o.first_party_id = ct.id
+            left join tb_user u on o.second_party_man_id = u.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+        </if>
+        <if test="direct == -1">
+            select count(1) from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_supplier ct on o.second_party_id = ct.id
+            left join tb_user u on o.first_party_man_id = u.id
+            left join t_linkman cl on o.second_party_man_id = cl.id
+        </if>
+        <where>
+            <if test="orderName != null">
+                and o.name like concat('%', #{orderName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="contractNo != null">
+                and c.number like concat('%', #{contractNo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and c.status = 0 and c.direct = #{direct}
+            </if>
+        </where>
+    </select>
+
+    <select resultType="Integer" id="getCountByOtherPartyId">
+        <if test="direct == 1">
+            select count(1) from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_customer ct on o.first_party_id = ct.id
+            left join tb_user u on o.second_party_man_id = u.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+        </if>
+        <if test="direct == -1">
+            select count(1) from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_supplier ct on o.second_party_id = ct.id
+            left join tb_user u on o.first_party_man_id = u.id
+            left join t_linkman cl on o.second_party_man_id = cl.id
+        </if>
+        <where>
+            <if test="otherPartyId != null">
+                and ct.id = #{otherPartyId,jdbcType=INTEGER}
+            </if>
+            <if test="true">
+                and c.status = 0 and c.direct = #{direct}
+            </if>
+        </where>
+    </select>
+
+    <select id="getById" resultType="net.chensee.platform.erp.action.contract.vo.ContractVo">
+        <if test="direct == 1">
+            select c.*, o.id as orderId, o.name as orderName, o.number as orderNumber,
+            ct.id as otherPartyId, ct.name as otherPartyName, u.id as saleManId,
+            u.real_name as saleManName, cl.id as otherPartyManId, cl.name as otherPartyManName,
+            cl.mobile_phone as otherPartyManPhone from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_customer ct on o.first_party_id = ct.id
+            left join tb_user u on o.second_party_man_id = u.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+        </if>
+        <if test="direct == -1">
+            select c.*, o.id as orderId, o.name as orderName, o.number as orderNumber,
+            ct.id as otherPartyId, ct.name as otherPartyName, u.id as saleManId,
+            u.real_name as saleManName, cl.id as otherPartyManId, cl.name as otherPartyManName,
+            cl.mobile_phone as otherPartyManPhone from t_contract c
+            left join t_order o on c.order_id = o.id
+            left join t_supplier ct on o.second_party_id = ct.id
+            left join tb_user u on o.first_party_man_id = u.id
+            left join t_linkman cl on o.second_party_man_id = cl.id
+        </if>
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and c.status = 0
+            </if>
+            <if test="true">
+                and c.id = #{contractId} order by c.update_time desc
+            </if>
+        </where>
+    </select>
+</mapper>

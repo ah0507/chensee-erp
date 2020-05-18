@@ -1,0 +1,12 @@
+file:
+  url: D:/file-doc
+  format:
+    png: image/png
+    jpeg: image/jpeg
+    jpg: image/jpeg
+    zip: application/octet-stream
+    pdf: application/octet-stream
+# 特殊情况：zip、pdf等不能预览时需要匹配下载
+  view:
+      - application/octet-stream
+

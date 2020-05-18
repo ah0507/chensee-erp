@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.product.mapper.ProductDao">
+    <select id="getAllProducts" resultType="net.chensee.platform.erp.action.product.vo.ProductVo">
+        select p.*, pt.id as typeId, pt.name as typeName, ptmn.model_name as modelName, ptu.name as unitName
+        from t_product p
+        left join t_product_type pt on p.type_id = pt.id
+        left join t_product_type_model ptmn on p.model = ptmn.id
+        left join t_product_type_unit ptu on ptu.id = pt.unit_id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                p.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and p.status = 0 and pt.status = 0 and ptmn.status = 0 and ptu.status = 0
+                limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getProductById" resultType="net.chensee.platform.erp.action.product.vo.ProductVo">
+        select p.*, pt.id as typeId, pt.name as typeName, ptmn.model_name as modelName, ptu.name as unitName
+        from t_product p
+        left join t_product_type pt on p.type_id = pt.id
+        left join t_product_type_model ptmn on p.model = ptmn.id
+        left join t_product_type_unit ptu on ptu.id = pt.unit_id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                p.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and p.status = 0 and pt.status = 0 and ptmn.status = 0 and ptu.status = 0 and p.id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByNameAndType" resultType="net.chensee.platform.erp.action.product.vo.ProductVo">
+        select p.*, pt.id as typeId, pt.name as typeName, ptmn.model_name as modelName, ptu.name as unitName
+        from t_product p
+        left join t_product_type pt on p.type_id = pt.id
+        left join t_product_type_model ptmn on p.model = ptmn.id
+        left join t_product_type_unit ptu on ptu.id = pt.unit_id
+        <where>
+            <if test="name != null">
+                and p.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="typeName != null">
+                and pt.name like concat('%', #{typeName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                p.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and p.status = 0 and pt.status = 0 and ptmn.status = 0 and ptu.status = 0
+            </if>
+        </where>
+        limit #{pageStart}, #{pageSize}
+    </select>
+
+    <insert id="addProduct" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> `name`,</if>
+            <if test="typeId!=null"> `type_id`,</if>
+            <if test="model!=null"> `model`,</if>
+            <if test="factory!=null"> `factory`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="typeId!=null"> #{typeId,jdbcType=INTEGER},</if>
+            <if test="model!=null"> #{model,jdbcType=INTEGER},</if>
+            <if test="factory!=null"> #{factory,jdbcType=VARCHAR},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProduct"  parameterType="INTEGER">
+        UPDATE t_product
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null"> name=#{name},</if>
+            <if test="typeId!=null"> type_id=#{typeId},</if>
+            <if test="model!=null"> model=#{model},</if>
+            <if test="factory!=null"> factory=#{factory},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteProduct">
+        UPDATE t_product set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select resultType="Integer" id="getCount">
+        select count(1)
+        from t_product p
+        left join t_product_type pt on p.type_id = pt.id
+        left join t_product_type_model ptmn on p.model = ptmn.id
+        left join t_product_type_unit ptu on ptu.id = pt.unit_id
+        <where>
+            <if test="name != null">
+                and p.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="typeName != null">
+                and pt.name like concat('%', #{typeName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                p.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and p.status = 0 and pt.status = 0 and ptmn.status = 0 and ptu.status = 0
+            </if>
+        </where>
+    </select>
+
+    <select id="getStockAmountById" parameterType="INTEGER">
+        select sum(surplus_number) from t_product_input where product_id = #{id}
+    </select>
+
+    <update id="updateStockAmount" parameterType="INTEGER">
+        update t_product set amounts = #{amounts} where id = #{id}
+    </update>
+</mapper>

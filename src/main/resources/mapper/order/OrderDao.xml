@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.order.mapper.OrderDao">
+    <select id="getAllOrders" resultType="net.chensee.platform.erp.action.order.vo.OrderVo">
+        <if test="direct == 1">
+            select o.*, c.name as firstPartyName, e.telephone as firstPartyPhone,
+            concat(r1.name,r2.name,r3.name,e.detail_address)as firstPartyAddress,
+            cl.name as firstPartyManName, d.name as secondPartyName, u.real_name as secondPartyManName
+            from t_order o
+            left join t_customer c on o.first_party_id = c.id
+            left join t_enterprise e on c.enterprise_id = e.id
+            left join t_region r1 on e.province_id = r1.id
+            left join t_region r2 on e.city_id = r2.id
+            left join t_region r3 on e.area_id = r3.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+            left join tb_dept d on d.id = o.second_party_id
+            left join tb_user u on u.id = o.second_party_man_id
+        </if>
+        <if test="direct == -1">
+            select o.*, s.name as secondPartyName, e.telephone as secondPartyPhone,
+            concat(r1.name,r2.name,r3.name,e.detail_address)as secondPartyAddress,
+            sl.name as secondPartyManName, d.name as firstPartyName, u.real_name as firstPartyManName
+            from t_order o
+            left join t_supplier s on o.second_party_id = s.id
+            left join t_enterprise e on s.enterprise_id = e.id
+            left join t_region r1 on e.province_id = r1.id
+            left join t_region r2 on e.city_id = r2.id
+            left join t_region r3 on e.area_id = r3.id
+            left join t_linkman sl on o.second_party_man_id = sl.id
+            left join tb_dept d on d.id = o.first_party_id
+            left join tb_user u on u.id = o.first_party_man_id
+        </if>
+        <where>
+            <if test="true">
+                and o.status = 0
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and o.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and o.direct = #{direct} order by o.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByNameAndNo" resultType="net.chensee.platform.erp.action.order.vo.OrderVo">
+        <if test="direct == 1">
+            select o.*, c.name as firstPartyName, e.telephone as firstPartyPhone,
+            concat(r1.name,r2.name,r3.name,e.detail_address)as firstPartyAddress,
+            cl.name as firstPartyManName, d.name as secondPartyName, u.real_name as secondPartyManName
+            from t_order o
+            left join t_customer c on o.first_party_id = c.id
+            left join t_enterprise e on c.enterprise_id = e.id
+            left join t_region r1 on e.province_id = r1.id
+            left join t_region r2 on e.city_id = r2.id
+            left join t_region r3 on e.area_id = r3.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+            left join tb_dept d on d.id = o.second_party_id
+            left join tb_user u on u.id = o.second_party_man_id
+        </if>
+        <if test="direct == -1">
+            select o.*, s.name as secondPartyName, e.telephone as secondPartyPhone,
+            concat(r1.name,r2.name,r3.name,e.detail_address)as secondPartyAddress,
+            sl.name as secondPartyManName, d.name as firstPartyName, u.real_name as firstPartyManName
+            from t_order o
+            left join t_supplier s on o.second_party_id = s.id
+            left join t_enterprise e on s.enterprise_id = e.id
+            left join t_region r1 on e.province_id = r1.id
+            left join t_region r2 on e.city_id = r2.id
+            left join t_region r3 on e.area_id = r3.id
+            left join t_linkman sl on o.second_party_man_id = sl.id
+            left join tb_dept d on d.id = o.first_party_id
+            left join tb_user u on u.id = o.first_party_man_id
+        </if>
+        <where>
+            <if test="name != null">
+                and o.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and o.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and o.status = 0 and o.direct = #{direct}
+            </if>
+        </where>
+        order by o.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <insert id="addOrder" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number!=null"> `number`,</if>
+            <if test="name!=null"> `name`,</if>
+            <if test="firstPartyId!=null"> `first_party_id`,</if>
+            <if test="firstPartyManId!=null"> `first_party_man_id`,</if>
+            <if test="secondPartyId!=null"> `second_party_id`,</if>
+            <if test="secondPartyManId!=null"> `second_party_man_id`,</if>
+            <if test="startTime!=null"> `start_time`,</if>
+            <if test="endTime!=null"> `end_time`,</if>
+            <if test="orderType!=null"> `order_type`,</if>
+            <if test="amount!=null"> `amount`,</if>
+            <if test="orderStatus!=null"> `order_status`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="direct!=null"> `direct`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+            <if test="isVirtual!=null"> `is_virtual`,</if>
+            <if test="fileIds!=null"> `file_ids`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number!=null"> #{number,jdbcType=VARCHAR},</if>
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="firstPartyId!=null"> #{firstPartyId,jdbcType=INTEGER},</if>
+            <if test="firstPartyManId!=null"> #{firstPartyManId,jdbcType=INTEGER},</if>
+            <if test="secondPartyId!=null"> #{secondPartyId,jdbcType=INTEGER},</if>
+            <if test="secondPartyManId!=null"> #{secondPartyManId,jdbcType=INTEGER},</if>
+            <if test="startTime!=null"> #{startTime,jdbcType=TIMESTAMP},</if>
+            <if test="endTime!=null"> #{endTime,jdbcType=TIMESTAMP},</if>
+            <if test="orderType!=null"> #{orderType,jdbcType=VARCHAR},</if>
+            <if test="amount!=null"> #{amount,jdbcType=INTEGER},</if>
+            <if test="orderStatus!=null"> #{orderStatus,jdbcType=VARCHAR},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="direct!=null"> #{direct,jdbcType=INTEGER},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+            <if test="isVirtual!=null"> #{isVirtual,jdbcType=INTEGER},</if>
+            <if test="fileIds!=null"> #{fileIds,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOrder"  parameterType="INTEGER">
+        UPDATE t_order
+        <trim prefix="set" suffixOverrides=",">
+            <if test="number!=null"> number=#{number},</if>
+            <if test="name!=null"> name=#{name},</if>
+            <if test="firstPartyId!=null"> first_party_id=#{firstPartyId},</if>
+            <if test="firstPartyManId!=null"> first_party_man_id=#{firstPartyManId},</if>
+            <if test="secondPartyId!=null"> second_party_id=#{secondPartyId},</if>
+            <if test="secondPartyManId!=null"> second_party_man_id=#{secondPartyManId},</if>
+            <if test="startTime!=null"> start_time=#{startTime},</if>
+            <if test="endTime!=null"> end_time=#{endTime},</if>
+            <if test="orderType!=null"> order_type=#{orderType},</if>
+            <if test="amount!=null"> amount=#{amount},</if>
+            <if test="orderStatus!=null"> order_status=#{orderStatus},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="direct!=null"> direct=#{direct},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+            <if test="isVirtual!=null"> is_virtual=#{isVirtual},</if>
+            <if test="fileIds!=null"> file_ids=#{fileIds},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteOrder">
+        UPDATE t_order set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select resultType="Integer" id="getCount">
+        <if test="direct == 1">
+            select count(1) from t_order o
+            left join t_customer c on o.first_party_id = c.id
+            left join t_enterprise e on c.enterprise_id = e.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+            left join tb_dept d on d.id = o.second_party_id
+            left join tb_user u on u.id = o.second_party_man_id
+        </if>
+        <if test="direct == -1">
+            select count(1) from t_order o
+            left join t_supplier s on o.second_party_id = s.id
+            left join t_enterprise e on s.enterprise_id = e.id
+            left join t_linkman sl on o.second_party_man_id = sl.id
+            left join tb_dept d on d.id = o.first_party_id
+            left join tb_user u on u.id = o.first_party_man_id
+        </if>
+        <where>
+            <if test="name != null">
+                and o.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and o.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and o.status = 0 and o.direct = #{direct}
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                o.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getByContractId" resultType="net.chensee.platform.erp.action.order.po.OrderPo">
+        select o.* from t_order o
+        left join t_order_contract oc on oc.order_id = o.id
+        where oc.id = #{contractId}
+    </select>
+
+    <select id="getById" resultType="net.chensee.platform.erp.action.order.vo.OrderVo">
+        <if test="direct == 1">
+            select o.*, c.name as firstPartyName, e.telephone as firstPartyPhone,
+            concat(r1.name,r2.name,r3.name,e.detail_address)as firstPartyAddress,
+            cl.name as firstPartyManName, d.name as secondPartyName, u.real_name as secondPartyManName
+            from t_order o
+            left join t_customer c on o.first_party_id = c.id
+            left join t_enterprise e on c.enterprise_id = e.id
+            left join t_region r1 on e.province_id = r1.id
+            left join t_region r2 on e.city_id = r2.id
+            left join t_region r3 on e.area_id = r3.id
+            left join t_linkman cl on o.first_party_man_id = cl.id
+            left join tb_dept d on d.id = o.second_party_id
+            left join tb_user u on u.id = o.second_party_man_id
+        </if>
+        <if test="direct == -1">
+            select o.*, s.name as secondPartyName, e.telephone as secondPartyPhone,
+            concat(r1.name,r2.name,r3.name,e.detail_address)as secondPartyAddress,
+            sl.name as secondPartyManName, d.name as firstPartyName, u.real_name as firstPartyManName
+            from t_order o
+            left join t_supplier s on o.second_party_id = s.id
+            left join t_enterprise e on s.enterprise_id = e.id
+            left join t_region r1 on e.province_id = r1.id
+            left join t_region r2 on e.city_id = r2.id
+            left join t_region r3 on e.area_id = r3.id
+            left join t_linkman sl on o.second_party_man_id = sl.id
+            left join tb_dept d on d.id = o.first_party_id
+            left join tb_user u on u.id = o.first_party_man_id
+        </if>
+        <where>
+            <if test="true">
+                and o.status = 0
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and o.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and o.direct = #{direct} and o.id = #{orderId} order by o.update_time desc
+            </if>
+        </where>
+    </select>
+</mapper>

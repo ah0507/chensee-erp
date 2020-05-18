@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.product.mapper.OutputBillDao">
+    <insert id="addOutputBill" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_output_bill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contractId!=null"> `contract_id`,</if>
+            <if test="orderId!=null"> `order_id`,</if>
+            <if test="outputTime!=null"> `output_time`,</if>
+            <if test="number!=null"> `number`,</if>
+            <if test="saleManId!=null"> `sale_man_id`,</if>
+            <if test="employeeId!=null"> `employee_id`,</if>
+            <if test="employeeDeptId!=null"> `employee_dept_id`,</if>
+            <if test="chargeManId!=null"> `charge_man_id`,</if>
+            <if test="sumAmount!=null"> `sum_amount`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contractId!=null"> #{contractId,jdbcType=INTEGER},</if>
+            <if test="orderId!=null"> #{orderId,jdbcType=INTEGER},</if>
+            <if test="outputTime!=null"> #{outputTime,jdbcType=TIMESTAMP},</if>
+            <if test="number!=null"> #{number,jdbcType=VARCHAR},</if>
+            <if test="saleManId!=null"> #{saleManId,jdbcType=INTEGER},</if>
+            <if test="employeeId!=null"> #{employeeId,jdbcType=INTEGER},</if>
+            <if test="employeeDeptId!=null"> #{employeeDeptId,jdbcType=INTEGER},</if>
+            <if test="chargeManId!=null"> #{chargeManId,jdbcType=INTEGER},</if>
+            <if test="sumAmount!=null"> #{sumAmount,jdbcType=INTEGER},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+    <insert id="addOutputLogPo" keyProperty="id" useGeneratedKeys="true">
+        insert into t_product_output_log
+        (input_id,output_id,output_number,before_output_number,after_output_number,create_time,create_by)
+        values
+        (#{inputId},#{outputId},#{outputNumber},#{beforeOutputNumber},#{afterOutputNumber},#{createTime},#{createBy})
+    </insert>
+    <update id="updateInputInfo" parameterType="net.chensee.platform.erp.action.product.po.ProductInputPo">
+        update t_product_input
+        set output_status=#{outputStatus},surplus_number=#{surplusNumber}
+        where id=#{id}
+    </update>
+
+    <select id="getAllOutputBill" resultType="net.chensee.platform.erp.action.product.vo.OutputBillVo">
+        select ob.*, u.real_name as saleManName, e.real_name as employeeName,
+        d.name as employeeDeptName, c.real_name as chargeManName, ct.number as contractNumber
+        from t_output_bill ob
+        left join tb_user u on ob.sale_man_id = u.id
+        left join tb_dept d on ob.employee_dept_id = d.id
+        left join tb_user c on ob.charge_man_id = c.id
+        left join tb_user e on ob.employee_id = e.id
+        left join t_contract ct on ct.id = ob.contract_id
+        where ob.status = 0 order by ob.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <select id="getProductOutputById" resultType="net.chensee.platform.erp.action.product.vo.OutputBillVo">
+        select ob.*, u.real_name as saleManName, e.real_name as employeeName,
+        d.name as employeeDeptName, c.real_name as chargeManName, ct.number as contractNumber
+        from t_output_bill ob
+        left join tb_user u on ob.sale_man_id = u.id
+        left join tb_dept d on ob.employee_dept_id = d.id
+        left join tb_user c on ob.charge_man_id = c.id
+        left join tb_user e on ob.employee_id = e.id
+        left join t_contract ct on ct.id = ob.contract_id
+        where ob.status = 0 and ob.id = #{id}
+    </select>
+
+    <select id="getByCondition" resultType="net.chensee.platform.erp.action.product.vo.OutputBillVo">
+        select ob.*, u.real_name as saleManName, e.real_name as employeeName,
+        d.name as employeeDeptName, c.real_name as chargeManName, ct.number as contractNumber
+        from t_output_bill ob
+        left join tb_user u on ob.sale_man_id = u.id
+        left join tb_dept d on ob.employee_dept_id = d.id
+        left join tb_user c on ob.charge_man_id = c.id
+        left join tb_user e on ob.employee_id = e.id
+        left join t_contract ct on ct.id = ob.contract_id
+        <where>
+            <if test="contractNumber != null">
+                and ct.number like concat('%', #{contractNumber,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="employeeDeptName != null">
+                and d.name like concat('%', #{employeeDeptName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="startTime != null">
+                and <![CDATA[ date(ob.output_time) >= #{startTime,jdbcType=DATE} ]]>
+            </if>
+            <if test="endTime != null">
+                and <![CDATA[ date(ob.output_time) <= #{endTime,jdbcType=DATE} ]]>
+            </if>
+            <if test="true">
+                and ob.status = 0 order by ob.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+
+    <delete id="deleteOutputBill">
+        UPDATE t_output_bill set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select resultType="Integer" id="getCount">
+        select count(1) from t_output_bill ob
+        left join tb_user u on ob.sale_man_id = u.id
+        left join tb_dept d on ob.employee_dept_id = d.id
+        left join tb_user c on ob.charge_man_id = c.id
+        left join tb_user e on ob.employee_id = e.id
+        left join t_contract ct on ct.id = ob.contract_id
+        <where>
+            <if test="contractNumber != null">
+                and ct.number like concat('%', #{contractNumber,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="deptName != null">
+                and d.name like concat('%', #{deptName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="startTime != null">
+                and <![CDATA[ date(ob.output_time) >= #{startTime,jdbcType=TIMESTAMP} ]]>
+            </if>
+            <if test="endTime != null">
+                and <![CDATA[ date(ob.output_time) <= #{endTime,jdbcType=TIMESTAMP} ]]>
+            </if>
+            <if test="true">
+                and ob.status = 0
+            </if>
+        </where>
+    </select>
+    <select id="getCurrentProductNumber" resultType="java.lang.Integer">
+        select sum(surplus_number) from t_product_input
+        where product_id=#{productId}
+        and status = 0
+        and output_status != 2
+    </select>
+    <select id="getInputByAsc" resultType="net.chensee.platform.erp.action.product.po.ProductInputPo">
+        select * from t_product_input
+        where product_id=#{productId}
+        and status = 0
+        and output_status != 2
+        ORDER BY create_time ASC
+        limit #{count},1
+    </select>
+    <select id="getInputByDesc" resultType="net.chensee.platform.erp.action.product.po.ProductInputPo">
+        select * from t_product_input
+        where product_id=#{productId}
+        and status = 0
+        and output_status != 2
+        ORDER BY create_time DESC
+        limit #{count},1
+    </select>
+
+</mapper>

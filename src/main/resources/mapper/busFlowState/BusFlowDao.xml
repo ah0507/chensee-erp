@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.busFLowState.mapper.BusFlowDao">
+    <insert id="saveOrUpdateBusFlowState">
+        insert into tb_business_flow_state
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="busCode!=null">`bus_code`,</if>
+            <if test="busId!=null">`bus_id`,</if>
+            <if test="runFlowId!=null">`run_flow_id`,</if>
+            <if test="flowState!=null">`flow_state`,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="busCode!=null">#{busCode,jdbcType=VARCHAR},</if>
+            <if test="busId!=null">#{busId,jdbcType=BIGINT},</if>
+            <if test="runFlowId!=null">#{runFlowId,jdbcType=VARCHAR},</if>
+            <if test="flowState!=null">#{flowState,jdbcType=TINYINT},</if>
+        </trim>
+        on duplicate key update flow_state = 2
+    </insert>
+
+    <select id="getFlowStateByBusCodeId" resultType="java.lang.String">
+        select flow_state from tb_business_flow_state where bus_code = #{busCode} and bus_id = #{busId}
+    </select>
+
+    <select id="getFlowStates" resultType="net.chensee.platform.erp.action.busFLowState.vo.BusFlowVo">
+        select * from tb_business_flow_state where bus_code = #{busCode} and bus_id in
+        <foreach collection="busIdList" item="busId" index="index" open="(" close=")" separator=",">
+            #{busId}
+        </foreach>
+    </select>
+
+    <select id="getFlow" resultType="net.chensee.platform.erp.action.busFLowState.vo.BusFlowVo">
+        select * from tb_business_flow_state where bus_code = #{busCode} and bus_id = #{busId}
+    </select>
+</mapper>

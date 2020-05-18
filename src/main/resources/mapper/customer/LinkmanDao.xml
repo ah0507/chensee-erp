@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.customer.mapper.LinkmanDao">
+    <select id="getAllCustomerLinkman" resultType="net.chensee.platform.erp.action.customer.vo.LinkmanVo">
+        select cl.*, c.id as customerId, c.name as customerName from t_linkman cl
+        left join t_customer c on cl.customer_id = c.id
+        <where>
+            <if test="true">
+                and cl.status = 0
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and cl.customer_id is not null order by cl.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getCustomerLinkmanById" resultType="net.chensee.platform.erp.action.customer.vo.LinkmanVo">
+        select cl.*, c.id as customerId, c.name as customerName from t_linkman cl
+        left join t_customer c on cl.customer_id = c.id
+        <where>
+            <if test="true">
+                and cl.status = 0 and cl.id = #{customerId} and cl.customer_id is not null
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getAllSupplierLinkman" resultType="net.chensee.platform.erp.action.customer.vo.LinkmanVo">
+        select cl.*, s.id as supplierId, s.name as supplierName from t_linkman cl
+        left join t_supplier s on cl.supplier_id = s.id
+        <where>
+            <if test="true">
+                and cl.status = 0
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and cl.supplier_id is not null order by cl.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getSupplierLinkmanById" resultType="net.chensee.platform.erp.action.customer.vo.LinkmanVo">
+        select cl.*, s.id as supplierId, s.name as supplierName from t_linkman cl
+        left join t_supplier s on cl.supplier_id = s.id
+        <where>
+            <if test="true">
+                and cl.status = 0 and cl.id = #{supplierId} and cl.supplier_id is not null
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getByCustomerNameAndName" resultType="net.chensee.platform.erp.action.customer.vo.LinkmanVo">
+        select cl.*, c.id as customerId,c.name as customerName from t_linkman cl
+        left join t_customer c on cl.customer_id = c.id
+        <where>
+            <if test="customerName != null">
+                and c.name like concat('%', #{customerName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="name != null">
+                and cl.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and cl.status = 0 and cl.customer_id is not null
+            </if>
+        </where>
+        order by cl.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <select id="getBySupplierNameAndName" resultType="net.chensee.platform.erp.action.customer.vo.LinkmanVo">
+        select cl.*, s.id as supplierId, s.name as supplierName from t_linkman cl
+        left join t_supplier s on cl.supplier_id = s.id
+        <where>
+            <if test="supplierName != null">
+                and s.name like concat('%', #{supplierName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="name != null">
+                and cl.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and cl.status = 0 and cl.supplier_id is not null
+            </if>
+        </where>
+        order by cl.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <select resultType="Integer" id="getCustomerCount">
+        select count(1) from t_linkman cl
+        left join t_customer c on cl.customer_id = c.id
+        <where>
+            <if test="customerName != null">
+                and c.name like concat('%', #{customerName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="name != null">
+                and cl.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and cl.status = 0 and cl.customer_id is not null
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select resultType="Integer" id="getSupplierCount">
+        select count(1) from t_linkman cl
+        left join t_supplier s on cl.supplier_id = s.id
+        <where>
+            <if test="supplierName != null">
+                and s.name like concat('%', #{supplierName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="name != null">
+                and cl.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and cl.status = 0 and cl.supplier_id is not null
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getByCustomer" resultType="net.chensee.platform.erp.action.customer.vo.LinkmanVo">
+        select cl.*, c.id as customerId, c.name as customerName from t_linkman cl
+        left join t_customer c on cl.customer_id = c.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and cl.status = 0 and c.id = #{customerId} limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getBySupplier" resultType="net.chensee.platform.erp.action.customer.vo.LinkmanVo">
+        select cl.*, s.id as supplierId, s.name as supplierName from t_linkman cl
+        left join t_supplier s on cl.supplier_id = s.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and cl.status = 0 and s.id = #{supplierId} limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select resultType="Integer" id="getCountByCustomer">
+        select count(1) from t_linkman cl
+        left join t_customer c on cl.customer_id = c.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and cl.status = 0 and c.id = #{customerId}
+            </if>
+        </where>
+    </select>
+
+    <select resultType="Integer" id="getCountBySupplier">
+        select count(1) from t_linkman cl
+        left join t_supplier s on cl.supplier_id = s.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                cl.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and cl.status = 0 and s.id = #{supplierId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="addLinkman" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_linkman
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerId!=null"> `customer_id`,</if>
+            <if test="supplierId!=null"> `supplier_id`,</if>
+            <if test="name!=null"> `name`,</if>
+            <if test="sex!=null"> `sex`,</if>
+            <if test="type!=null"> `type_`,</if>
+            <if test="business!=null"> `business`,</if>
+            <if test="birthday!=null"> `birthday`,</if>
+            <if test="chargeStatus!=null"> `charge_status`,</if>
+            <if test="dept!=null"> `dept`,</if>
+            <if test="appellation!=null"> `appellation`,</if>
+            <if test="position!=null"> `position`,</if>
+            <if test="mail!=null"> `mail`,</if>
+            <if test="telephone!=null"> `telephone`,</if>
+            <if test="postalCode!=null"> `postal_code`,</if>
+            <if test="mobilePhone!=null"> `mobile_phone`,</if>
+            <if test="detailAddress!=null"> `detail_address`,</if>
+            <if test="cardType!=null"> `card_type`,</if>
+            <if test="cardNo!=null"> `card_no`,</if>
+            <if test="photoUrl!=null"> `photo_url`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+            <if test="fileIds!=null"> `file_ids`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerId!=null"> #{customerId,jdbcType=INTEGER},</if>
+            <if test="supplierId!=null"> #{supplierId,jdbcType=INTEGER},</if>
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="sex!=null"> #{sex,jdbcType=VARCHAR},</if>
+            <if test="type!=null"> #{type,jdbcType=VARCHAR},</if>
+            <if test="business!=null"> #{business,jdbcType=VARCHAR},</if>
+            <if test="birthday!=null"> #{birthday,jdbcType=TIMESTAMP},</if>
+            <if test="chargeStatus!=null"> #{chargeStatus,jdbcType=VARCHAR},</if>
+            <if test="dept!=null"> #{dept,jdbcType=VARCHAR},</if>
+            <if test="appellation!=null"> #{appellation,jdbcType=VARCHAR},</if>
+            <if test="position!=null"> #{position,jdbcType=VARCHAR},</if>
+            <if test="mail!=null"> #{mail,jdbcType=VARCHAR},</if>
+            <if test="telephone!=null"> #{telephone,jdbcType=VARCHAR},</if>
+            <if test="postalCode!=null"> #{postalCode,jdbcType=VARCHAR},</if>
+            <if test="mobilePhone!=null"> #{mobilePhone,jdbcType=VARCHAR},</if>
+            <if test="detailAddress!=null"> #{detailAddress,jdbcType=VARCHAR},</if>
+            <if test="cardType!=null"> #{cardType,jdbcType=VARCHAR},</if>
+            <if test="cardNo!=null"> #{cardNo,jdbcType=VARCHAR},</if>
+            <if test="photoUrl!=null"> #{photoUrl,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+            <if test="fileIds!=null"> #{fileIds,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <update id="updateLinkman"  parameterType="INTEGER">
+        UPDATE t_linkman
+        <trim prefix="set" suffixOverrides=",">
+            <if test="customerId!=null"> customer_id=#{customerId},</if>
+            <if test="supplierId!=null"> supplier_id=#{supplierId},</if>
+            <if test="name!=null"> name=#{name},</if>
+            <if test="sex!=null"> sex=#{sex},</if>
+            <if test="type!=null"> type_=#{type},</if>
+            <if test="business!=null"> business=#{business},</if>
+            <if test="birthday!=null"> birthday=#{birthday},</if>
+            <if test="chargeStatus!=null"> charge_status=#{chargeStatus},</if>
+            <if test="dept!=null"> dept=#{dept},</if>
+            <if test="appellation!=null"> appellation=#{appellation},</if>
+            <if test="position!=null"> position=#{position},</if>
+            <if test="mail!=null"> mail=#{mail},</if>
+            <if test="telephone!=null"> telephone=#{telephone},</if>
+            <if test="postalCode!=null"> postal_code=#{postalCode},</if>
+            <if test="mobilePhone!=null"> mobile_phone=#{mobilePhone},</if>
+            <if test="detailAddress!=null"> detail_address=#{detailAddress},</if>
+            <if test="cardType!=null"> card_type=#{cardType},</if>
+            <if test="cardNo!=null"> card_no=#{cardNo},</if>
+            <if test="photoUrl!=null"> photo_url=#{photoUrl},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+            <if test="fileIds!=null"> file_ids=#{fileIds},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteLinkman">
+        UPDATE t_linkman set status = 1 WHERE id = #{id}
+    </delete>
+
+
+</mapper>

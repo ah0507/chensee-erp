@@ -1,0 +1,78 @@
+server:
+  port: 8888
+
+logging:
+  level:
+    net.chensee.base: debug
+    net.chensee.platform.erp: debug
+    org.springframework.security: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+spring:
+  application:
+    name: cs-erp
+  profiles:
+    include: cache
+  datasource:
+    url : jdbc:mysql://192.168.2.101:3306/cs_erp?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username : chensee
+    password : 1qaz@WSX
+    driverClassName : com.mysql.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 1000MB
+  aop:
+    auto: true
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml, classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 500
+    default-statement-timeout: 80
+
+# JWT 配置
+jwt:
+  # 存放Token的Header Key
+  header: Authorization
+  # 密匙key
+  secret: mySecret
+  # 过期时间   单位秒 7天后过期  604800
+  expiration: 3600
+  # 自定义token 前缀字符
+  tokenHead: cs_
+  # 超时时间   单位秒
+  access_token: 3600
+  # 刷新token时间   单位秒
+  refresh_token: 3600
+  route:
+    authentication:
+      path: login/entry
+      refresh: oauth/refresh
+      register: login/account
+
+
+# 配置不需要认证的接口
+com:
+  example:
+    oauth:
+      security:
+        antMatchers: /login,/favicon.ico,/swagger-ui.html,/swagger-resources/**,/images/**,/webjars/**,/v2/**,/configuration/ui,/configuration/security,/busFlow/update/state,/role/**/users,/userGroup/**/users
+
+pageNumber: 1
+pageSize: 30
+
+#消息日志系统
+logMsgUrl: http://localhost:8887/
+#日志记录是否开启
+isLogFlag: true
+
+flow:
+  request:
+    url: http://192.168.2.201:8920
+  tenant: 2222

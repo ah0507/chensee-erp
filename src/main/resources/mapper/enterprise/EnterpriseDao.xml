@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.enterprise.mapper.EnterpriseDao">
+    <select id="getAllEnterprise" resultType="net.chensee.platform.erp.action.enterprise.vo.EnterpriseVo">
+        select e.*, p.name as parentName, r1.name AS province, r2.name AS city, r3.name AS area
+        from t_enterprise e
+        left join t_region r1 on e.province_id = r1.id
+        left join t_region r2 on e.city_id = r2.id
+        left join t_region r3 on e.area_id = r3.id
+        left join t_enterprise p on p.id = e.parent_id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                e.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and e.status = 0 order by e.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getById" resultType="net.chensee.platform.erp.action.enterprise.vo.EnterpriseVo">
+        select e.*, p.name as parentName, r1.name AS province, r2.name AS city, r3.name AS area
+        from t_enterprise e
+        left join t_region r1 on e.province_id = r1.id
+        left join t_region r2 on e.city_id = r2.id
+        left join t_region r3 on e.area_id = r3.id
+        left join t_enterprise p on p.id = e.parent_id
+        where e.status = 0 and e.id = #{id}
+    </select>
+
+    <select id="getByNameAndNo" resultType="net.chensee.platform.erp.action.enterprise.vo.EnterpriseVo">
+        select e.*, p.name as parentName, r1.name AS province, r2.name AS city, r3.name AS area
+        from t_enterprise e
+        left join t_region r1 on e.province_id = r1.id
+        left join t_region r2 on e.city_id = r2.id
+        left join t_region r3 on e.area_id = r3.id
+        left join t_enterprise p on p.id = e.parent_id
+        <where>
+            <if test="name != null">
+                and e.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and e.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and e.status = 0
+            </if>
+        </where>
+        order by e.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <insert id="addEnterprise" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_enterprise
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number!=null"> `number`,</if>
+            <if test="name!=null"> `name`,</if>
+            <if test="parentId!=null"> `parent_id`,</if>
+            <if test="grade!=null"> `grade`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="provinceId!=null"> `province_id`,</if>
+            <if test="cityId!=null"> `city_id`,</if>
+            <if test="areaId!=null"> `area_id`,</if>
+            <if test="detailAddress!=null"> `detail_address`,</if>
+            <if test="mail!=null"> `mail`,</if>
+            <if test="telephone!=null"> `telephone`,</if>
+            <if test="website!=null"> `website`,</if>
+            <if test="postalCode!=null"> `postal_code`,</if>
+            <if test="mobilePhone!=null"> `mobile_phone`,</if>
+            <if test="birthday!=null"> `birthday`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number!=null"> #{number,jdbcType=VARCHAR},</if>
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="parentId!=null"> #{parentId,jdbcType=INTEGER},</if>
+            <if test="grade!=null"> #{grade,jdbcType=VARCHAR},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="provinceId!=null"> #{provinceId,jdbcType=INTEGER},</if>
+            <if test="cityId!=null"> #{cityId,jdbcType=INTEGER},</if>
+            <if test="areaId!=null"> #{areaId,jdbcType=INTEGER},</if>
+            <if test="detailAddress!=null"> #{detailAddress,jdbcType=VARCHAR},</if>
+            <if test="mail!=null"> #{mail,jdbcType=VARCHAR},</if>
+            <if test="telephone!=null"> #{telephone,jdbcType=VARCHAR},</if>
+            <if test="website!=null"> #{website,jdbcType=VARCHAR},</if>
+            <if test="postalCode!=null"> #{postalCode,jdbcType=VARCHAR},</if>
+            <if test="mobilePhone!=null"> #{mobilePhone,jdbcType=VARCHAR},</if>
+            <if test="birthday!=null"> #{birthday,jdbcType=TIMESTAMP},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateEnterprise">
+        UPDATE t_enterprise
+        <trim prefix="set" suffixOverrides=",">
+            <if test="number!=null"> number=#{number},</if>
+            <if test="name!=null"> name=#{name},</if>
+            <if test="parentId!=null"> parent_id=#{parentId},</if>
+            <if test="grade!=null"> grade=#{grade},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="provinceId!=null"> province_id=#{provinceId},</if>
+            <if test="cityId!=null"> city_id=#{cityId},</if>
+            <if test="areaId!=null"> area_id=#{areaId},</if>
+            <if test="detailAddress!=null"> detail_address=#{detailAddress},</if>
+            <if test="mail!=null"> mail=#{mail},</if>
+            <if test="telephone!=null"> telephone=#{telephone},</if>
+            <if test="website!=null"> website=#{website},</if>
+            <if test="postalCode!=null"> postal_code=#{postalCode},</if>
+            <if test="mobilePhone!=null"> mobile_phone=#{mobilePhone},</if>
+            <if test="birthday!=null"> birthday=#{birthday},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteEnterprise">
+        UPDATE t_enterprise set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select resultType="Integer" id="getCount">
+        select count(1) from t_enterprise e
+        left join t_enterprise p on p.id = e.parent_id
+        <where>
+            <if test="name != null">
+                and e.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and e.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and e.status = 0
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                e.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getEnterpriseByConfig" resultType="net.chensee.platform.erp.action.enterprise.vo.EnterpriseVo">
+        select e.*, p.name as parentName, r1.name AS province, r2.name AS city, r3.name AS area
+        from t_enterprise e
+        left join t_region r1 on e.province_id = r1.id
+        left join t_region r2 on e.city_id = r2.id
+            left join t_region r3 on e.area_id = r3.id
+        left join t_enterprise p on p.id = e.parent_id
+        <where>
+            <if test="queryConfigPos != null and queryConfigPos.size() != 0">
+                <foreach collection="queryConfigPos" index="index" item="queryConfigPo">
+                    <if test="queryConfigPo.opr == 'in' and queryConfigPo.value != null and queryConfigPo.value.size() != 0">
+                        and ${queryConfigPo.alias} ${queryConfigPo.opr}
+                        <foreach collection="queryConfigPo.value" item="item" index="index" separator="," open="(" close=")" >
+                            #{item}
+                        </foreach>
+                    </if>
+                    <if test="queryConfigPo.alias !=null and queryConfigPo.opr !=null and queryConfigPo.opr!='in' and queryConfigPo.alias != null">
+                        and ${queryConfigPo.alias} ${queryConfigPo.opr} #{queryConfigPo.value}
+                    </if>
+                </foreach>
+            </if>
+            <if test="true">
+                and e.status = 0
+            </if>
+        </where>
+        order by e.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+    <select id="getEnterpriseCount" resultType="java.lang.Integer">
+        select count(1) from t_enterprise e
+        left join t_enterprise p on p.id = e.parent_id
+        <where>
+            <if test="queryConfigPos != null and queryConfigPos.size() != 0">
+                <foreach collection="queryConfigPos" index="index" item="queryConfigPo">
+                    <if test="queryConfigPo.opr == 'in' and queryConfigPo.value != null and queryConfigPo.value.size() != 0">
+                        and ${queryConfigPo.alias} ${queryConfigPo.opr}
+                        <foreach collection="queryConfigPo.value" item="item" index="index" separator="," open="(" close=")" >
+                            #{item}
+                        </foreach>
+                    </if>
+                    <if test="queryConfigPo.alias !=null and queryConfigPo.opr !=null and queryConfigPo.opr!='in' and queryConfigPo.alias != null">
+                        and ${queryConfigPo.alias} ${queryConfigPo.opr} #{queryConfigPo.value}
+                    </if>
+                </foreach>
+            </if>
+            <if test="true">
+                and e.status = 0
+            </if>
+            <if test="currentFolders != null and currentFolders.size() != 0">
+                and
+                e.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getQueryFieldByConfig" resultType="java.lang.Object">
+        select ${alias} from t_enterprise e
+        <where>
+            <if test="queryType == 3">
+                ${alias} ${opr} #{value}
+            </if>
+            and ${alias} is not null
+        </where>
+        group by ${alias}
+    </select>
+</mapper>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.product.mapper.ProductTypeDao">
+    <select id="getAllProductTypes" resultType="net.chensee.platform.erp.action.product.vo.ProductTypeVo">
+        select p.*, pt.id as parentId, pt.name as parentName, ptu.name as unitName, ptm.model_name as modelName
+        from (select * from t_product_type p1 where p1.status = 0 limit #{pageStart}, #{pageSize}) p
+        left join t_product_type pt on p.parent_id = pt.id and pt.status = 0
+        left join t_product_type_unit ptu on p.unit_id = ptu.id and ptu.status = 0
+        left join t_product_type_model ptm on ptm.type_id = p.id and ptm.status = 0
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                p.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getProductTypesByCondition" resultType="net.chensee.platform.erp.action.product.vo.ProductTypeVo">
+        select p.*, pt.id as parentId, pt.name as parentName, ptu.name as unitName, ptm.model_name as modelName
+        from (select * from t_product_type p1
+        <where>
+            <if test="true">
+                and p1.status = 0
+            </if>
+            <if test="name != null">
+                and p1.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+        limit #{pageStart}, #{pageSize}) p
+        left join t_product_type pt on p.parent_id = pt.id and pt.status = 0
+        left join t_product_type_unit ptu on p.unit_id = ptu.id and ptu.status = 0
+        left join t_product_type_model ptm on ptm.type_id = p.id and ptm.status = 0
+        <where>
+            <if test="parentName != null">
+                and pt.name like concat('%', #{parentName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="unitName != null">
+                and ptu.name like concat('%', #{unitName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                p.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getCountProductTypes" resultType="java.lang.Integer">
+        select count(*)
+        from t_product_type p
+        left join t_product_type pt on p.parent_id = pt.id and pt.status = 0
+        left join t_product_type_unit ptu on p.unit_id = ptu.id and ptu.status = 0
+        /*left join t_product_type_model ptm on ptm.type_id = p.id and ptm.status = 0*/
+        <where>
+            <if test="name != null">
+                and p.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="parentName != null">
+                and pt.name like concat('%', #{parentName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="unitName != null">
+                and ptu.name like concat('%', #{unitName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                p.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and p.status = 0
+            </if>
+        </where>
+    </select>
+
+    <select id="getProductTypeById" resultType="net.chensee.platform.erp.action.product.vo.ProductTypeVo">
+        select p.*, pt.id as parentId, pt.name as parentName, ptu.name as unitName, ptm.model_name as modelName
+        from t_product_type p
+        left join t_product_type pt on p.parent_id = pt.id and pt.status = 0
+        left join t_product_type_unit ptu on p.unit_id = ptu.id and ptu.status = 0
+        left join t_product_type_model ptm on ptm.type_id = p.id and ptm.status = 0
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                p.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and p.id = #{typeId} and p.status = 0
+            </if>
+        </where>
+    </select>
+
+    <insert id="addProductType" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_product_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> `name`,</if>
+            <if test="parentId!=null"> `parent_id`,</if>
+            <if test="unitId!=null"> `unit_id`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="parentId!=null"> #{parentId,jdbcType=INTEGER},</if>
+            <if test="unitId!=null"> #{unitId,jdbcType=INTEGER},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProductType"  parameterType="INTEGER">
+        UPDATE t_product_type
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null"> name=#{name},</if>
+            <if test="parentId!=null"> parent_id=#{parentId},</if>
+            <if test="unitId!=null"> unit_id=#{unitId},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteProductType">
+        UPDATE t_product_type set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select id="getChildrenIds" resultType="list">
+        select id from t_product_type where parent_id = #{id}
+    </select>
+
+    <insert id="addProductTypeModel" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_product_type_model
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="typeId!=null"> `type_id`,</if>
+            <if test="modelName!=null"> `model_name`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="typeId!=null"> #{typeId,jdbcType=INTEGER},</if>
+            <if test="modelName!=null"> #{modelName,jdbcType=VARCHAR},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <select id="getProductTypeModel" resultType="net.chensee.platform.erp.action.product.vo.ProductTypeModelVo">
+        select * from t_product_type_model where type_id = #{id} and status = 0 limit #{pageStart},#{pageSize}
+    </select>
+
+    <select id="getCountModelByTypeId" resultType="java.lang.Integer">
+        select count(*) from t_product_type_model where type_id = #{id} and status = 0
+    </select>
+
+    <update id="deleteProductTypeModel">
+        update t_product_type_model set status = 1 where id = #{id}
+    </update>
+</mapper>

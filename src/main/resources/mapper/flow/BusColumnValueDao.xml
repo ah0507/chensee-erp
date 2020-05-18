@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.flow.mapper.BusColumnValueDao">
+
+    <insert id="addBusColumnsAndValues">
+        insert into tb_business_column_value
+        (bus_code,bus_id,column_and_value)
+        values
+        (#{busCode},#{busId},#{columnAndValue})
+    </insert>
+
+    <select id="getColumnValueByBusKey" resultType="net.chensee.platform.erp.action.flow.po.BusColumnAndValuePo">
+        select * from tb_business_column_value where bus_code = #{busCode} and bus_id = #{busId}
+    </select>
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.flow.mapper.FlowDao">
+    <select id="getFlowBusRelations" resultType="net.chensee.platform.erp.action.flow.vo.FlowVo">
+        select * from tb_business_to_flow
+    </select>
+
+    <select id="getFlowBusRelationById" resultType="net.chensee.platform.erp.action.flow.vo.FlowVo">
+        select * from tb_business_to_flow where id = #{id}
+    </select>
+
+    <select id="getFlowBusRelationByBusId" resultType="net.chensee.platform.erp.action.flow.vo.FlowVo">
+        select * from tb_business_to_flow where business_id = #{businessId}
+    </select>
+
+    <insert id="addFlowBusRelation" keyProperty="id" useGeneratedKeys="true">
+        insert into tb_business_to_flow
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessId!=null">`business_id`,</if>
+            <if test="flowId!=null">`flow_id`,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessId!=null">#{businessId,jdbcType=BIGINT},</if>
+            <if test="flowId!=null">#{flowId,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteFlowBusRelation">
+        delete from tb_business_to_flow where id = #{id}
+    </delete>
+
+    <select id="getBusinessByFlowId" resultType="net.chensee.platform.erp.action.business.vo.BusinessVo">
+        select b.* from tb_business b
+        left join tb_business_to_flow btf on b.id = btf.business_id
+        where b.status = 0 and btf.flow_id = #{flowId}
+    </select>
+
+    <insert id="addBatchFlowBusRelations">
+        insert into tb_business_to_flow
+        (business_id,flow_id)
+        values
+        <foreach collection="busIds" item="busId" index="index" separator=",">
+            (#{busId},#{flowId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRelationByBusId">
+        delete from tb_business_to_flow where business_id in
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

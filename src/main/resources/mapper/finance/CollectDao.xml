@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.finance.mapper.CollectDao">
+    <insert id="addCollect" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_collect
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> `name`,</if>
+            <if test="number!=null"> `number`,</if>
+            <if test="customerId!=null"> `customer_id`,</if>
+            <if test="orderId!=null"> `order_id`,</if>
+            <if test="payeeId!=null"> `payee_id`,</if>
+            <if test="contractId!=null"> `contract_id`,</if>
+            <if test="collectTime!=null"> `collect_time`,</if>
+            <if test="amount!=null"> `amount`,</if>
+            <if test="chargeManId!=null"> `charge_man_id`,</if>
+            <if test="collectMethod!=null"> `collect_method`,</if>
+            <if test="billId!=null"> `bill_id`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+            <if test="isApprove!=null"> `is_approve`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="number!=null"> #{number,jdbcType=VARCHAR},</if>
+            <if test="customerId!=null"> #{customerId,jdbcType=INTEGER},</if>
+            <if test="orderId!=null"> #{orderId,jdbcType=INTEGER},</if>
+            <if test="payeeId!=null"> #{payeeId,jdbcType=INTEGER},</if>
+            <if test="contractId!=null"> #{contractId,jdbcType=INTEGER},</if>
+            <if test="collectTime!=null"> #{collectTime,jdbcType=TIMESTAMP},</if>
+            <if test="amount!=null"> #{amount,jdbcType=INTEGER},</if>
+            <if test="chargeManId!=null"> #{chargeManId,jdbcType=INTEGER},</if>
+            <if test="collectMethod!=null"> #{collectMethod,jdbcType=VARCHAR},</if>
+            <if test="billId!=null"> #{billId,jdbcType=INTEGER},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+            <if test="isApprove!=null"> #{isApprove,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <select id="getAllCollect" resultType="net.chensee.platform.erp.action.finance.vo.CollectVo">
+        select c.*, ct.name as customerName, o.name as orderName, u.real_name as payeeName,
+        co.name as contractNumber, us.real_name as chargeManName, b.number as billNumber,
+        b.bill_time as billTime from t_collect c
+        left join t_customer ct on c.customer_id = ct.id
+        left join t_order o on c.order_id = o.id
+        left join tb_user u on c.payee_id = u.id
+        left join t_contract co on c.contract_id = co.id
+        left join tb_user us on c.charge_man_id = us.id
+        left join t_bill b on c.bill_id = b.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and c.status = 0 order by c.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByCustomerNameAndNumber" resultType="net.chensee.platform.erp.action.finance.vo.CollectVo">
+        select c.*, ct.name as customerName, o.name as orderName, u.real_name as payeeName,
+        co.name as contractNumber, us.real_name as chargeManName, b.number as billNumber,
+        b.bill_time as billTime from t_collect c
+        left join t_customer ct on c.customer_id = ct.id
+        left join t_order o on c.order_id = o.id
+        left join tb_user u on c.payee_id = u.id
+        left join t_contract co on c.contract_id = co.id
+        left join tb_user us on c.charge_man_id = us.id
+        left join t_bill b on c.bill_id = b.id
+        <where>
+            <if test="customerName != null">
+                and ct.name like concat('%', #{customerName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and c.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and c.status = 0
+            </if>
+        </where>
+        order by c.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <select id="getByContractId" resultType="net.chensee.platform.erp.action.finance.vo.CollectVo">
+        select c.*, ct.name as customerName, o.name as orderName, u.real_name as payeeName,
+        co.name as contractNumber, us.real_name as chargeManName, b.number as billNumber,
+        b.bill_time as billTime from t_collect c
+        left join t_customer ct on c.customer_id = ct.id
+        left join t_order o on c.order_id = o.id
+        left join tb_user u on c.payee_id = u.id
+        left join t_contract co on c.contract_id = co.id
+        left join tb_user us on c.charge_man_id = us.id
+        left join t_bill b on c.bill_id = b.id
+        where co.id = #{contractId,jdbcType=INTEGER} and c.status = 0
+    </select>
+
+    <select id="getCollectById" resultType="net.chensee.platform.erp.action.finance.vo.CollectVo">
+        select c.*, ct.name as customerName, o.name as orderName, u.real_name as payeeName,
+        co.name AS contractName, co.number AS contractNumber, us.real_name as chargeManName, b.number as billNumber,
+        b.bill_time as billTime from t_collect c
+        left join t_customer ct on c.customer_id = ct.id
+        left join t_order o on c.order_id = o.id
+        left join tb_user u on c.payee_id = u.id
+        left join t_contract co on c.contract_id = co.id
+        left join tb_user us on c.charge_man_id = us.id
+        left join t_bill b on c.bill_id = b.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and c.status = 0 and c.id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateCollect"  parameterType="INTEGER">
+        UPDATE t_collect
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null"> name=#{name},</if>
+            <if test="number!=null"> number=#{number},</if>
+            <if test="customerId!=null"> customer_id=#{customerId},</if>
+            <if test="orderId!=null"> order_id=#{orderId},</if>
+            <if test="payeeId!=null"> payee_id=#{payeeId},</if>
+            <if test="contractId!=null"> contract_id=#{contractId},</if>
+            <if test="collectTime!=null"> collect_time=#{collectTime},</if>
+            <if test="amount!=null"> amount=#{amount},</if>
+            <if test="chargeManId!=null"> charge_man_id=#{chargeManId},</if>
+            <if test="collectMethod!=null"> collect_method=#{collectMethod},</if>
+            <if test="billId!=null"> bill_id=#{billId},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteCollect">
+        UPDATE t_collect set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select resultType="Integer" id="getCount">
+        select count(1) from t_collect c
+        left join t_customer ct on c.customer_id = ct.id
+        left join t_order o on c.order_id = o.id
+        left join tb_user u on c.payee_id = u.id
+        left join t_contract co on c.contract_id = co.id
+        left join tb_user us on c.charge_man_id = us.id
+        left join t_bill b on c.bill_id = b.id
+        <where>
+            <if test="customerName != null">
+                and ct.name like concat('%', #{customerName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and c.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and c.status = 0
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

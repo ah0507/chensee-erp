@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.customer.mapper.CustomerActivityDao">
+    <select id="getAllCustomerActivity" resultType="net.chensee.platform.erp.action.customer.vo.CustomerActivityVo">
+        select ca.*, c.id as customerId, c.name as customerName, u.id as chargeManId,
+        u.real_name as chargeManName, cl.id as linkmanId, cl.name as linkmanName
+        from t_customer_activity ca
+        left join t_customer c on ca.customer_id = c.id
+        left join tb_user u on ca.charge_man_id = u.id
+        left join t_linkman cl on ca.linkman_id = cl.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                ca.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and ca.status = 0 order by ca.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByThemeAndNo" resultType="net.chensee.platform.erp.action.customer.vo.CustomerActivityVo">
+        select ca.*, c.id as customerId, c.name as customerName, u.id as chargeManId,
+        u.real_name as chargeManName, cl.id as linkmanId, cl.name as linkmanName
+        from t_customer_activity ca
+        left join t_customer c on ca.customer_id = c.id
+        left join tb_user u on ca.charge_man_id = u.id
+        left join t_linkman cl on ca.linkman_id = cl.id
+        <where>
+            <if test="theme != null">
+                and ca.theme like concat('%', #{theme,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and ca.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and ca.status = 0
+            </if>
+        </where>
+        order by ca.update_time desc limit #{pageStart}, #{pageSize}
+    </select>
+
+    <select id="getCustomerActivityById" resultType="net.chensee.platform.erp.action.customer.vo.CustomerActivityVo">
+        select ca.*, c.id as customerId, c.name as customerName, u.id as chargeManId,
+        u.real_name as chargeManName, cl.id as linkmanId, cl.name as linkmanName
+        from t_customer_activity ca
+        left join t_customer c on ca.customer_id = c.id
+        left join tb_user u on ca.charge_man_id = u.id
+        left join t_linkman cl on ca.linkman_id = cl.id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                ca.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and ca.status = 0 and ca.id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <insert id="addCustomerActivity" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_customer_activity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number!=null"> `number`,</if>
+            <if test="theme!=null"> `theme`,</if>
+            <if test="customerId!=null"> `customer_id`,</if>
+            <if test="type!=null"> `type_`,</if>
+            <if test="chargeManId!=null"> `charge_man_id`,</if>
+            <if test="linkmanId!=null"> `linkman_id`,</if>
+            <if test="socialStage!=null"> `social_stage`,</if>
+            <if test="linkTime!=null"> `link_time`,</if>
+            <if test="nextTime!=null"> `next_time`,</if>
+            <if test="mail!=null"> `mail`,</if>
+            <if test="telephone!=null"> `telephone`,</if>
+            <if test="content!=null"> `content`,</if>
+            <if test="resultInfo!=null"> `result_info`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number!=null"> #{number,jdbcType=VARCHAR},</if>
+            <if test="theme!=null"> #{theme,jdbcType=VARCHAR},</if>
+            <if test="customerId!=null"> #{customerId,jdbcType=INTEGER},</if>
+            <if test="type!=null"> #{type,jdbcType=VARCHAR},</if>
+            <if test="chargeManId!=null"> #{chargeManId,jdbcType=INTEGER},</if>
+            <if test="linkmanId!=null"> #{linkmanId,jdbcType=INTEGER},</if>
+            <if test="socialStage!=null"> #{socialStage,jdbcType=VARCHAR},</if>
+            <if test="linkTime!=null"> #{linkTime,jdbcType=TIMESTAMP},</if>
+            <if test="nextTime!=null"> #{nextTime,jdbcType=TIMESTAMP},</if>
+            <if test="mail!=null"> #{mail,jdbcType=VARCHAR},</if>
+            <if test="telephone!=null"> #{telephone,jdbcType=VARCHAR},</if>
+            <if test="content!=null"> #{content,jdbcType=VARCHAR},</if>
+            <if test="resultInfo!=null"> #{resultInfo,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCustomerActivity"  parameterType="INTEGER">
+        UPDATE t_customer_activity
+        <trim prefix="set" suffixOverrides=",">
+            <if test="number!=null"> number=#{number},</if>
+            <if test="theme!=null"> theme=#{theme},</if>
+            <if test="customerId!=null"> customer_id=#{customerId},</if>
+            <if test="type!=null"> type_=#{type},</if>
+            <if test="chargeManId!=null"> charge_man_id=#{chargeManId},</if>
+            <if test="linkmanId!=null"> linkman_id=#{linkmanId},</if>
+            <if test="socialStage!=null"> social_stage=#{socialStage},</if>
+            <if test="linkTime!=null"> link_time=#{linkTime},</if>
+            <if test="nextTime!=null"> next_time=#{nextTime},</if>
+            <if test="mail!=null"> mail=#{mail},</if>
+            <if test="telephone!=null"> telephone=#{telephone},</if>
+            <if test="content!=null"> content=#{content},</if>
+            <if test="resultInfo!=null"> result_info=#{resultInfo},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteCustomerActivity">
+        UPDATE t_customer_activity set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select resultType="Integer" id="getCount">
+        select count(1)
+        from t_customer_activity ca
+        left join t_customer c on ca.customer_id = c.id
+        left join tb_user u on ca.charge_man_id = u.id
+        left join t_linkman cl on ca.linkman_id = cl.id
+        <where>
+            <if test="theme != null">
+                and ca.theme like concat('%', #{theme,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and ca.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="true">
+                and ca.status = 0
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                ca.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

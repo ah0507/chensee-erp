@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="net.chensee.platform.erp.action.customer.mapper.CustomerDao">
+    <select id="getAllCustomers" resultType="net.chensee.platform.erp.action.customer.vo.CustomerVo">
+        select c.*, e.id as enterpriseId, e.name as enterpriseName, u.id as chargeManId,
+        u.real_name as chargeManName, f.id as financialId, f.name as financialName,
+        f.taxpayer_code as financialTaxpayerCode, f.addr_phone as financialAddrPhone,
+        f.bank_account as financialBankAccount, e.mail as enterpriseEmail
+        from t_customer c
+        left join t_enterprise e on e.id = c.enterprise_id
+        left join tb_user u on c.charge_man_id = u.id
+        left join t_financial_info f on c.id = f.customer_id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and c.status = 0 order by c.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByNameAndNo" resultType="net.chensee.platform.erp.action.customer.vo.CustomerVo">
+        select c.*, e.id as enterpriseId, e.name as enterpriseName, u.id as chargeManId,
+        u.real_name as chargeManName, f.id as financialId, f.name as financialName,
+        f.taxpayer_code as financialTaxpayerCode, f.addr_phone as financialAddrPhone,
+        f.bank_account as financialBankAccount
+        from t_customer c
+        left join t_enterprise e on e.id = c.enterprise_id
+        left join tb_user u on c.charge_man_id = u.id
+        left join t_financial_info f on c.id = f.customer_id
+        <where>
+            <if test="name != null">
+                and c.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and c.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and c.status = 0 order by c.update_time desc limit #{pageStart}, #{pageSize}
+            </if>
+        </where>
+    </select>
+
+    <select resultType="Integer" id="getCount">
+        select count(1) from t_customer c
+        left join t_enterprise e on e.id = c.enterprise_id
+        left join tb_user u on c.charge_man_id = u.id
+        left join t_financial_info f on c.id = f.customer_id
+        <where>
+            <if test="name != null">
+                and c.name like concat('%', #{name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="number != null">
+                and c.number like concat('%', #{number,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="true">
+                and c.status = 0
+            </if>
+        </where>
+    </select>
+
+    <insert id="addCustomer" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="enterpriseId!=null"> `enterprise_id`,</if>
+            <if test="number!=null"> `number`,</if>
+            <if test="name!=null"> `name`,</if>
+            <if test="type!=null"> `type_`,</if>
+            <if test="resource!=null"> `resource`,</if>
+            <if test="signStatus!=null"> `sign_status`,</if>
+            <if test="stage!=null"> `stage`,</if>
+            <if test="relation!=null"> `relation`,</if>
+            <if test="chargeManId!=null"> `charge_man_id`,</if>
+            <if test="remark!=null"> `remark`,</if>
+            <if test="createTime!=null"> `create_time`,</if>
+            <if test="createBy!=null"> `create_by`,</if>
+            <if test="updateTime!=null"> `update_time`,</if>
+            <if test="updateBy!=null"> `update_by`,</if>
+            <if test="version!=null"> `version_`,</if>
+            <if test="status!=null"> `status`,</if>
+            <if test="folderId!=null"> `folder_id`,</if>
+            <if test="deptId!=null"> `dept_id`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="enterpriseId!=null"> #{enterpriseId,jdbcType=INTEGER},</if>
+            <if test="number!=null"> #{number,jdbcType=VARCHAR},</if>
+            <if test="name!=null"> #{name,jdbcType=VARCHAR},</if>
+            <if test="type!=null"> #{type,jdbcType=VARCHAR},</if>
+            <if test="resource!=null"> #{resource,jdbcType=VARCHAR},</if>
+            <if test="signStatus!=null"> #{signStatus,jdbcType=VARCHAR},</if>
+            <if test="stage!=null"> #{stage,jdbcType=VARCHAR},</if>
+            <if test="relation!=null"> #{relation,jdbcType=VARCHAR},</if>
+            <if test="chargeManId!=null"> #{chargeManId,jdbcType=INTEGER},</if>
+            <if test="remark!=null"> #{remark,jdbcType=VARCHAR},</if>
+            <if test="createTime!=null"> #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createBy!=null"> #{createBy,jdbcType=INTEGER},</if>
+            <if test="updateTime!=null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy!=null"> #{updateBy,jdbcType=INTEGER},</if>
+            <if test="version!=null"> #{version,jdbcType=INTEGER},</if>
+            <if test="status!=null"> #{status,jdbcType=INTEGER},</if>
+            <if test="folderId!=null"> #{folderId,jdbcType=INTEGER},</if>
+            <if test="deptId!=null"> #{deptId,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCustomer"  parameterType="INTEGER">
+        UPDATE t_customer
+        <trim prefix="set" suffixOverrides=",">
+            <if test="enterpriseId!=null"> enterprise_id=#{enterpriseId},</if>
+            <if test="number!=null"> number=#{number},</if>
+            <if test="name!=null"> name=#{name},</if>
+            <if test="type!=null"> type_=#{type},</if>
+            <if test="resource!=null"> resource=#{resource},</if>
+            <if test="signStatus!=null"> sign_status=#{signStatus},</if>
+            <if test="stage!=null"> stage=#{stage},</if>
+            <if test="relation!=null"> relation=#{relation},</if>
+            <if test="chargeManId!=null"> charge_man_id=#{chargeManId},</if>
+            <if test="remark!=null"> remark=#{remark},</if>
+            <if test="createTime!=null"> create_time=#{createTime},</if>
+            <if test="createBy!=null"> create_by=#{createBy},</if>
+            <if test="updateTime!=null"> update_time=#{updateTime},</if>
+            <if test="updateBy!=null"> update_by=#{updateBy},</if>
+            <if test="version!=null"> version_=#{version},</if>
+            <if test="status!=null"> status=#{status},</if>
+            <if test="folderId!=null"> folder_id=#{folderId},</if>
+            <if test="deptId!=null"> dept_id=#{deptId},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteCustomer">
+        UPDATE t_customer set status = 1 WHERE id = #{id}
+    </delete>
+
+    <select id="getById" resultType="net.chensee.platform.erp.action.customer.vo.CustomerVo">
+        select c.*, e.id as enterpriseId, e.name as enterpriseName, u.id as chargeManId,
+        u.real_name as chargeManName, f.id as financialId, f.name as financialName,
+        f.taxpayer_code as financialTaxpayerCode, f.addr_phone as financialAddrPhone,
+        f.bank_account as financialBankAccount, e.mail as enterpriseEmail
+        from t_customer c
+        left join t_enterprise e on e.id = c.enterprise_id
+        left join tb_user u on c.charge_man_id = u.id
+        left join t_financial_info f on c.id = f.customer_id
+        <where>
+            <if test="currentFolders != null &amp;&amp; currentFolders.size() != 0">
+                and
+                c.folder_id in
+                <foreach collection="currentFolders" item="folderId" index="index" open="(" close=")" separator=",">
+                    #{folderId}
+                </foreach>
+            </if>
+            <if test="true">
+                and c.status = 0 and c.id = #{id} order by c.update_time desc
+            </if>
+        </where>
+    </select>
+</mapper>
